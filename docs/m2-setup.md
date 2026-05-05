@@ -2,7 +2,7 @@
 
 Author: Sheriff
 Last updated: 2026-05-05
-Status: Phase 2 deliverable, scaffold complete and pending Vercel project link
+Status: Phase 2 deliverable, scaffold and first Vercel deploy live, blocked on auto deploy until plan or repo visibility resolved
 
 ---
 
@@ -82,28 +82,58 @@ pnpm lint         # eslint
 
 ## Vercel
 
-**Status: pending team invite from Omar.**
+### Account and project
 
-The Omnivate Vercel team is the deployment target. The user signing up for Vercel needs to be invited to the existing team rather than creating a new one. Action: Omar invites via vercel.com → Omnivate team → Settings → Members → Invite.
+* Vercel username: `amzat-1257`
+* Active scope: `amzat-1257's projects` (personal scope, no Omnivate team membership yet)
+* Project: `roi-calculator` under `amzat-1257s-projects/roi-calculator`
+* Local link: `.vercel/` directory in repo root, gitignored
 
-Once joined and signed in via `vercel login`, the M2 finishing steps:
+### Live URL
 
-1. Run `vercel link` from the local repo to create the project under the Omnivate team
-2. Confirm the linked project appears in the Vercel dashboard
-3. Push to `main` and watch auto deploy succeed
-4. Add four empty environment variable slots (see below)
-5. Custom subdomain `roi.omnivate.ai` is deferred until Omar approves DNS access
+The first production deploy is live at:
 
-### Environment variables (placeholder slots, to be added in Vercel)
+* Stable alias: **`https://roi-calculator-taupe-ten.vercel.app`**
+* Specific deployment: `https://roi-calculator-artf79u15-amzat-1257s-projects.vercel.app`
+* Vercel inspector: `https://vercel.com/amzat-1257s-projects/roi-calculator/dpl_5eUEpcjd7zahQMS5sr2JHirVq76a`
 
-| Variable | Phase that uses it | Notes |
-|---|---|---|
-| `SMARTLEAD_API_KEY` | Phase 5 | API key for the Omnivate Smartlead account |
-| `SMARTLEAD_CAMPAIGN_ID` | Phase 5 | Campaign ID for the transactional PDF delivery campaign (created in Phase 5) |
-| `SUPABASE_URL` | Phase 5 | Supabase project URL for lead persistence |
-| `SUPABASE_SERVICE_ROLE_KEY` | Phase 5 | Service role key for server side writes from the API route |
+Build completed in 21 seconds, status `READY`, target `production`. The placeholder homepage renders correctly.
 
-All four are added as empty placeholders so Phase 5 wiring does not require redeploys for env var changes.
+### Auto deploy on push to main: not yet working
+
+Linking the GitHub repo to Vercel for automatic deploys on push failed with:
+
+> The repository "Roi-Calculator" is private and owned by an organization, which is not supported on the Hobby plan. Upgrade to Pro to continue.
+
+This means: with a personal Hobby account, Vercel cannot watch a private GitHub org repo for pushes. Two paths forward:
+
+1. **Make the GitHub repo public.** The cheapest fix. The codebase is a public ROI calculator with no secrets baked in (all sensitive values live in Vercel env vars). Auto deploy works on Hobby once the repo is public.
+2. **Move to the Omnivate team on a Pro plan.** Once Sheriff is invited to the Omnivate Vercel team and the team has Pro features, the project is transferred (one click) and auto deploy starts working with the repo staying private.
+
+Decision pending from Omar.
+
+### Manual deploy in the meantime
+
+Until auto deploy is wired, fresh deploys require running this from the local repo:
+
+```
+vercel deploy --prod --yes
+```
+
+This is fine for low frequency Phase 3 and Phase 4 work but slows the iteration loop. Worth resolving before Phase 4 build kicks off.
+
+### Environment variables
+
+Four placeholder slots are configured in production:
+
+| Variable | Phase that uses it | Current value | Notes |
+|---|---|---|---|
+| `SMARTLEAD_API_KEY` | Phase 5 | `placeholder_set_in_phase_5` | Replace with the Omnivate Smartlead API key when wiring PDF delivery |
+| `SMARTLEAD_CAMPAIGN_ID` | Phase 5 | `placeholder_set_in_phase_5` | Replace with the transactional PDF delivery campaign ID created in Phase 5 |
+| `SUPABASE_URL` | Phase 5 | `placeholder_set_in_phase_5` | Supabase project URL for lead persistence |
+| `SUPABASE_SERVICE_ROLE_KEY` | Phase 5 | `placeholder_set_in_phase_5` | Service role key for server side writes from the API route |
+
+Vercel does not allow truly empty env values, so a placeholder string is used. Replace with real values via the dashboard or `vercel env` CLI in Phase 5. No code references these variables yet, so the placeholders cause no runtime errors.
 
 ---
 
@@ -124,10 +154,13 @@ All four are added as empty placeholders so Phase 5 wiring does not require rede
 
 ## Outstanding for M2 sign off
 
-* [ ] Omar invites Sheriff to the Omnivate Vercel team
-* [ ] Sheriff runs `vercel login` and `vercel link` from the local repo
-* [ ] First successful Vercel deploy confirms the placeholder homepage at the Vercel default URL
-* [ ] Four empty env var slots added in the Vercel project
+* [x] Frontend Design, GitHub MCP, and Vercel MCP installed and verified
+* [x] Next.js 16 scaffold committed to GitHub `main`
+* [x] `pnpm build` produces clean production build
+* [x] First successful Vercel deploy live at `https://roi-calculator-taupe-ten.vercel.app`
+* [x] Four env var slots configured (placeholder values, real values land in Phase 5)
+* [ ] Omar decision: make GitHub repo public, or invite Sheriff to Omnivate Vercel Pro team
+* [ ] Auto deploy on push to `main` working (depends on the decision above)
 * [ ] M2 Loom recorded showing the live URL, repo on GitHub, Vercel project, and the Frontend Design plugin responding in Claude Code
 
-Phase 3 (M3 requirements stack) starts after Omar signs off on M2.
+Phase 3 (M3 requirements stack) can start in parallel with the Vercel auto deploy resolution since M3 is pure documentation work and does not require redeploys.
