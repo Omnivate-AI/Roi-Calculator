@@ -1,8 +1,8 @@
 # M2. Tooling setup
 
 Author: Sheriff
-Last updated: 2026-05-05
-Status: Phase 2 deliverable, scaffold and first Vercel deploy live, blocked on auto deploy until plan or repo visibility resolved
+Last updated: 2026-05-06
+Status: Phase 2 deliverable, complete and ready for sign off
 
 ---
 
@@ -99,28 +99,28 @@ The first production deploy is live at:
 
 Build completed in 21 seconds, status `READY`, target `production`. The placeholder homepage renders correctly.
 
-### Auto deploy on push to main: not yet working
+### Auto deploy on push to main: working
 
-Linking the GitHub repo to Vercel for automatic deploys on push failed with:
+Initial setup hit a Hobby plan limitation: Vercel free tier does not allow auto deploy from a private repo owned by a GitHub organization. Decision after standup with Omar: **make the repo public.** The codebase is a marketing facing ROI calculator with no secrets in code (all sensitive values are Vercel environment variables) and no proprietary algorithms (the funnel math is industry standard, documented at the public reference site cold-email-roi-calculator.com).
 
-> The repository "Roi-Calculator" is private and owned by an organization, which is not supported on the Hobby plan. Upgrade to Pro to continue.
-
-This means: with a personal Hobby account, Vercel cannot watch a private GitHub org repo for pushes. Two paths forward:
-
-1. **Make the GitHub repo public.** The cheapest fix. The codebase is a public ROI calculator with no secrets baked in (all sensitive values live in Vercel env vars). Auto deploy works on Hobby once the repo is public.
-2. **Move to the Omnivate team on a Pro plan.** Once Sheriff is invited to the Omnivate Vercel team and the team has Pro features, the project is transferred (one click) and auto deploy starts working with the repo staying private.
-
-Decision pending from Omar.
-
-### Manual deploy in the meantime
-
-Until auto deploy is wired, fresh deploys require running this from the local repo:
+After flipping the repo to public:
 
 ```
-vercel deploy --prod --yes
+vercel git connect https://github.com/Omnivate-AI/Roi-Calculator
 ```
 
-This is fine for low frequency Phase 3 and Phase 4 work but slows the iteration loop. Worth resolving before Phase 4 build kicks off.
+Connection succeeded. Every push to `main` now triggers a Vercel build and production deploy automatically. No manual `vercel deploy` calls needed for ongoing work.
+
+### Pre commit secret scanning
+
+To eliminate the risk of accidentally committing a secret to the now public repo, a pre commit hook runs [secretlint](https://github.com/secretlint/secretlint) with the recommended preset on every commit. If any staged file contains a string matching known API key, token, or credential patterns, the commit is rejected before it reaches the repo.
+
+Setup details:
+
+* `husky` 9 manages git hooks via `.husky/pre-commit`
+* `secretlint` 13 with `@secretlint/secretlint-rule-preset-recommend` does the scanning
+* Config lives at `.secretlintrc.json` at the repo root
+* Manual scan: `pnpm exec secretlint --secretlintignore .gitignore "**/*"`
 
 ### Environment variables
 
@@ -159,8 +159,9 @@ Vercel does not allow truly empty env values, so a placeholder string is used. R
 * [x] `pnpm build` produces clean production build
 * [x] First successful Vercel deploy live at `https://roi-calculator-taupe-ten.vercel.app`
 * [x] Four env var slots configured (placeholder values, real values land in Phase 5)
-* [ ] Omar decision: make GitHub repo public, or invite Sheriff to Omnivate Vercel Pro team
-* [ ] Auto deploy on push to `main` working (depends on the decision above)
+* [x] GitHub repo flipped to public with Omar approval
+* [x] Vercel auto deploy on push to `main` connected and working
+* [x] Pre commit hook with secretlint installed to prevent accidental secret commits
 * [ ] M2 Loom recorded showing the live URL, repo on GitHub, Vercel project, and the Frontend Design plugin responding in Claude Code
 
-Phase 3 (M3 requirements stack) can start in parallel with the Vercel auto deploy resolution since M3 is pure documentation work and does not require redeploys.
+Phase 3 (M3 requirements stack) can start as soon as Omar signs off on M2.
