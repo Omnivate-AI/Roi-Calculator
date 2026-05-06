@@ -2,7 +2,7 @@
 
 Author: Sheriff
 Last updated: 2026-05-06
-Status: Phase 3 deliverable, awaiting Omar review before M4 build begins
+Status: Phase 3 deliverable, decisions confirmed by Omar, awaiting Loom + sign off before M4 build
 
 ---
 
@@ -705,20 +705,20 @@ If the PDF generation API route throws an error in M5:
 
 ---
 
-## Open decisions for Omar
+## Decisions confirmed by Omar
 
-These are calls I want Omar to confirm before M4 starts. None block M4 from kicking off; defaults are documented.
+All ten open decisions resolved. Captured here for the record.
 
-1. **Pricing input visibility.** I chose visible per Omar's standup. Confirming: the input is shown to the visitor with a default of 4000 USD per month, visitors can adjust it, and Omar can hardcode and hide it once a final price is settled.
-2. **Sensitivity band ten percent variance.** Plus or minus 10% on each conversion rate. Could be 5%, 15%, or another number. Reasonable defaults exist. Confirming 10% is right.
-3. **Hidden pipeline default of 0.3%.** Conservative compared to the reference site (which uses higher implicit rates). I prefer conservative because honesty earns trust. Confirming.
-4. **Halo uplift default of 8%.** Same reasoning. Confirming.
-5. **Subscription dual display.** For SaaS deals we plan to show both annualised MRR added and lifetime value cohort revenue. Two numbers for one motion. Confirming this is helpful rather than confusing.
-6. **PDF hosted link vs attachment.** I chose hosted link in Phase 5. Confirming; we can swap later if desired.
-7. **Light theme only.** Omar previously confirmed; calling out here as a final lock in.
-8. **Branded PDF logo.** Do we have an SVG version of the Omnivate logo I can embed? If not, the wordmark approach is fine.
-9. **Footer copy.** "Built by Omnivate AI." Plus a privacy link. Do we have a privacy policy URL to point at?
-10. **Loom recording cadence.** I kept treating each phase as one Loom; confirming that is still the right pattern.
+1. **Pricing input visibility:** Visible to the visitor with a default of 4,000 USD per month. Visitors can adjust to test ROI at different price points. Hardcode and hide once a final price is settled.
+2. **Sensitivity band variance:** Plus or minus 10% on each conversion rate. Confirmed.
+3. **Hidden pipeline default:** 0.3% conservative. Confirmed.
+4. **Halo uplift default:** 8% conservative. Confirmed.
+5. **Subscription dual display:** Show both annualised MRR added and lifetime value cohort revenue for SaaS deals. Confirmed.
+6. **PDF delivery via Smartlead:** Hosted PDF link delivered in a single transactional Smartlead email. No follow up sequence. Confirmed.
+7. **Light theme only:** Confirmed. No dark mode toggle.
+8. **Branded PDF logo:** Omnivate logo provided. Saved at `public/omnivate-logo.png` (SVG version if available preferred). Logo is the purple brain-circuit mark plus the "Omnivate AI" wordmark on a black square background, matching the brand palette already specified in this document.
+9. **Footer privacy link:** Points to `https://omnivate.ai/privacy`. (Pending visual verification that the page renders actual privacy content; the SPA returns HTTP 200 for every path so we cannot confirm via HTTP alone.)
+10. **Loom recording cadence:** One five minute Loom per phase, recorded by Sheriff and shared with Omar via Slack at the end of each mini project. Confirmed.
 
 ---
 
@@ -734,7 +734,8 @@ These are calls I want Omar to confirm before M4 starts. None block M4 from kick
 * [x] Funnel visualisation styled and animated
 * [x] PDF output spec including sections, branding, and generator choice
 * [x] Edge cases enumerated with handling
-* [ ] Omar reviews and confirms the open decisions above
+* [x] All ten open decisions confirmed by Omar
+* [ ] Omnivate logo file committed at `public/omnivate-logo.png` (or `.svg`)
 * [ ] M3 Loom recorded walking through the doc
 
 Phase 4 (M4 build the calculator) starts after Omar signs off on M3.
