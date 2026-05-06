@@ -44,7 +44,8 @@ export function ComparisonView({
         <div
           className="relative overflow-hidden rounded-2xl border border-brand-primary/30 bg-card p-6"
           style={{
-            boxShadow: "0 0 60px hsl(var(--brand-primary) / 0.18)",
+            boxShadow:
+              "0 1px 3px 0 hsl(220 43% 11% / 0.08), 0 12px 32px -8px hsl(var(--brand-primary) / 0.18)",
           }}
         >
           <div
@@ -52,11 +53,11 @@ export function ComparisonView({
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at top right, hsl(var(--brand-primary) / 0.18), transparent 60%)",
+                "radial-gradient(circle at top right, hsl(var(--brand-primary) / 0.08), transparent 60%)",
             }}
           />
           <div className="relative space-y-3">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-brand-electric">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-brand-primary">
               With Omnivate
             </p>
             <p
@@ -90,7 +91,7 @@ function Row({ label, value, muted, highlight }: RowProps) {
       <span className={muted ? "text-muted-foreground" : "text-foreground"}>{label}</span>
       <span
         className={`font-mono tabular-nums ${
-          highlight ? "text-brand-electric font-semibold" : "text-foreground"
+          highlight ? "text-brand-primary font-semibold" : "text-foreground"
         }`}
       >
         {value}

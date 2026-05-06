@@ -40,7 +40,7 @@ export function HeroNumber({
           style={{
             backgroundImage:
               "linear-gradient(135deg, hsl(var(--brand-electric)) 0%, hsl(var(--brand-primary)) 100%)",
-            filter: "drop-shadow(0 0 60px hsl(var(--brand-primary) / 0.45))",
+            filter: "drop-shadow(0 4px 16px hsl(var(--brand-primary) / 0.18))",
           }}
         >
           {formatMultiple(roiMultiple)}

@@ -62,7 +62,7 @@ export function FunnelViz(props: FunnelVizProps) {
   const maxValue = stages[0].value || 1; // contacts reached, never zero in practice
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-[0_0_60px_hsl(var(--brand-primary)/0.06)]">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-[0_1px_3px_0_hsl(220_43%_11%_/_0.06),_0_4px_16px_-4px_hsl(var(--brand-primary)/0.08)]">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">

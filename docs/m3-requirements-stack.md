@@ -34,17 +34,17 @@ Pulled directly from the omnivate.ai stylesheet. All values shown in HSL because
 | `brand-secondary` | `271 65% 45%` | `#7E22CE`    | Gradient anchor, deeper purple for hover and pressed states                                                                                           |
 | `brand-accent`    | `280 75% 55%` | `#A855F7`    | Mid gradient stop, highlight pills, secondary CTA                                                                                                     |
 | `brand-electric`  | `285 80% 60%` | `#C026D3`    | Sparingly used: emphasis on the headline ROI number, sensitivity band ceiling                                                                         |
-| `brand-sunset`    | `45 100% 70%` | `#FBBF24`    | Reserved for the "with Omnivate" delta in side by side comparison and the final headline ROI multiple. Single warm pop against the cool purple field. |
-| `surface-base`    | `0 0% 4%`     | `#0A0A0A`    | Page background                                                                                                                                       |
-| `surface-raised`  | `222 84% 5%`  | `#0B0F19`    | Card surface                                                                                                                                          |
-| `surface-overlay` | `220 14% 12%` | `#1F2937`    | Tooltip and popover background                                                                                                                        |
-| `text-primary`    | `0 0% 98%`    | `#FAFAFA`    | Body text                                                                                                                                             |
-| `text-secondary`  | `220 9% 65%`  | `#A1A5AC`    | Helper copy, axis labels                                                                                                                              |
-| `text-muted`      | `220 9% 45%`  | `#6B7180`    | Disabled, footer                                                                                                                                      |
-| `border`          | `220 14% 18%` | `#262E3D`    | Card edges, dividers                                                                                                                                  |
-| `success`         | `142 71% 45%` | `#22C55E`    | Reserved for confirmation states ("Your PDF is on its way")                                                                                           |
-| `warning`         | `38 92% 50%`  | `#F59E0B`    | Reserved for edge case warnings (e.g., "100% churn produces zero LTV")                                                                                |
-| `error`           | `0 84% 60%`   | `#EF4444`    | Form validation errors only                                                                                                                           |
+| `brand-sunset`    | `38 92% 45%`  | `#D97706`    | Reserved for the "with Omnivate" delta in side by side comparison and the final headline ROI multiple. Single warm amber pop against the cool purple field on a white surface. |
+| `surface-base`    | `0 0% 100%`   | `#FFFFFF`    | Page background                                                                                                                                       |
+| `surface-raised`  | `0 0% 100%`   | `#FFFFFF`    | Card surface (same as base, separated from background by border + shadow not by color)                                                                |
+| `surface-muted`   | `220 14% 96%` | `#F1F2F4`    | Subtle group backgrounds, secondary surfaces                                                                                                          |
+| `text-primary`    | `222 47% 11%` | `#0F172A`    | Body text                                                                                                                                             |
+| `text-secondary`  | `220 9% 46%`  | `#6B7280`    | Helper copy, axis labels                                                                                                                              |
+| `text-muted`      | `220 9% 60%`  | `#9CA3AF`    | Disabled, footer                                                                                                                                      |
+| `border`          | `220 13% 91%` | `#E5E7EB`    | Card edges, dividers                                                                                                                                  |
+| `success`         | `142 76% 36%` | `#16A34A`    | Reserved for confirmation states ("Your PDF is on its way")                                                                                           |
+| `warning`         | `35 92% 45%`  | `#D97706`    | Reserved for edge case warnings (e.g., "100% churn produces zero LTV")                                                                                |
+| `error`           | `0 72% 51%`   | `#DC2626`    | Form validation errors only                                                                                                                           |
 
 ### Gradient system
 
@@ -54,14 +54,16 @@ Pulled directly from the omnivate.ai stylesheet. All values shown in HSL because
 | `accent`      | `linear-gradient(135deg, hsl(280 75% 55%), hsl(285 80% 60%))`                            | Funnel stage highlights, animated transitions                   |
 | `radial-glow` | `radial-gradient(ellipse 80% 60% at 50% -20%, hsl(263 70% 50% / 0.18), transparent 60%)` | Page top ambient glow (already used on the M2 placeholder page) |
 
-### Shadow system (signature look)
+### Shadow system (tuned for light surfaces)
 
-| Shadow        | Definition                                                                          | Usage                       |
-| ------------- | ----------------------------------------------------------------------------------- | --------------------------- |
-| `glow-soft`   | `0 0 40px hsl(263 70% 50% / 0.4)`                                                   | Hover states on primary CTA |
-| `glow-strong` | `0 0 60px hsl(263 70% 50% / 0.6)`                                                   | Hero ROI number container   |
-| `card`        | `0 4px 6px -1px hsl(220 43% 11% / 0.1), 0 2px 4px -1px hsl(220 43% 11% / 0.06)`     | Default card elevation      |
-| `card-hover`  | `0 20px 25px -5px hsl(220 43% 11% / 0.1), 0 10px 10px -5px hsl(220 43% 11% / 0.04)` | Card hover lift             |
+| Shadow        | Definition                                                                                | Usage                                            |
+| ------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `glow-soft`   | `0 0 30px hsl(263 70% 50% / 0.18)`                                                        | Hover states on primary CTA, "with Omnivate" card |
+| `glow-strong` | `0 4px 16px hsl(263 70% 50% / 0.18)` (drop-shadow filter on hero ROI number)              | Hero number depth                                 |
+| `card`        | `0 1px 3px 0 hsl(220 43% 11% / 0.08), 0 1px 2px 0 hsl(220 43% 11% / 0.04)`                | Default card elevation                            |
+| `card-hover`  | `0 10px 25px -5px hsl(220 43% 11% / 0.1), 0 4px 10px -2px hsl(220 43% 11% / 0.05)`        | Card hover lift                                   |
+
+Light surfaces require softer shadows than dark. Heavy purple glow effects appropriate on a dark canvas wash out and look amateurish on white. Effects on light theme rely on subtle elevation plus targeted purple tinting on the most important elements (hero number, "with Omnivate" card).
 
 ### Typography
 
@@ -97,7 +99,7 @@ Calculator is for serious decision makers, not casual visitors. Density is moder
 
 ### Theme
 
-**Light theme only.** Dark surface (`surface-base #0A0A0A`) is the default and only theme. No dark mode toggle. The page reads as a single sophisticated dark surface with purple gradients providing contrast and energy.
+**Light theme only.** White surface (`surface-base #FFFFFF`) is the default and only theme. No dark mode toggle. The page reads as a clean white canvas with crisp typography, purple brand accents, and warm amber for the headline result. This matches the omnivate.ai website's primary look and produces a sophisticated, business-serious feel without the modern-but-overused dark aesthetic.
 
 ---
 
