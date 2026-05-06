@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
+/* ============================================================ */
+/*  Omnivate ROI Calculator theme.                              */
+/*  Source of truth: docs/m3-requirements-stack.md (Visual ID). */
+/*  Palette pulled from omnivate.ai stylesheet.                 */
+/* ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --brand-primary: 263 70% 50%;
+  --brand-secondary: 271 65% 45%;
+  --brand-accent: 280 75% 55%;
+  --brand-electric: 285 80% 60%;
+  --brand-sunset: 45 100% 70%;
+
+  /* Surfaces */
+  --background: 0 0% 4%;
+  --foreground: 0 0% 98%;
+  --card: 222 84% 5%;
+  --card-foreground: 0 0% 98%;
+  --popover: 220 14% 12%;
+  --popover-foreground: 0 0% 98%;
+
+  /* Semantic mappings (shadcn pattern) */
+  --primary: var(--brand-primary);
+  --primary-foreground: 0 0% 98%;
+  --secondary: 220 14% 18%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 220 14% 12%;
+  --muted-foreground: 220 9% 65%;
+  --accent: var(--brand-accent);
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 220 14% 18%;
+  --input: 220 14% 18%;
+  --ring: var(--brand-primary);
+
+  /* Status */
+  --success: 142 71% 45%;
+  --warning: 38 92% 50%;
+
+  /* Radius */
+  --radius: 0.5rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Tailwind utility classes pull from these tokens. */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  /* Brand specific (referenced via class names like bg-brand-primary). */
+  --color-brand-primary: hsl(var(--brand-primary));
+  --color-brand-secondary: hsl(var(--brand-secondary));
+  --color-brand-accent: hsl(var(--brand-accent));
+  --color-brand-electric: hsl(var(--brand-electric));
+  --color-brand-sunset: hsl(var(--brand-sunset));
+
+  /* Status colors. */
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+
+  /* Fonts. Geist is loaded in app/layout.tsx via next/font. */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Border radius scale. */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Signature shadow system. Purple glow is the Omnivate look. */
+  --shadow-glow-soft: 0 0 40px hsl(var(--brand-primary) / 0.4);
+  --shadow-glow-strong: 0 0 60px hsl(var(--brand-primary) / 0.6);
+  --shadow-card: 0 4px 6px -1px hsl(220 43% 11% / 0.1),
+    0 2px 4px -1px hsl(220 43% 11% / 0.06);
+  --shadow-card-hover: 0 20px 25px -5px hsl(220 43% 11% / 0.1),
+    0 10px 10px -5px hsl(220 43% 11% / 0.04);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Base resets and body. */
+* {
+  border-color: hsl(var(--border));
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Tabular figures for any element that wants stable number columns. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sophisticated focus ring. Subtle purple glow, never the harsh blue default. */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Reduce motion respect. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

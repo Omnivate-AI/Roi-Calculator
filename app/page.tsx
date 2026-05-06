@@ -1,51 +1,162 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { calculateRoi } from "@/lib/calculations";
+import { DEFAULT_INPUTS, getDefaultsForMotion } from "@/lib/defaults";
+import type { CalculatorInputs, SalesMotion, TimeHorizon } from "@/lib/types";
+import { ControlsPanel } from "@/components/calculator/ControlsPanel";
+import { FunnelViz } from "@/components/calculator/FunnelViz";
+import { HeroNumber } from "@/components/calculator/HeroNumber";
+import { RoiSummary } from "@/components/calculator/RoiSummary";
+import { ComparisonView } from "@/components/calculator/ComparisonView";
+import { PdfCaptureForm } from "@/components/calculator/PdfCaptureForm";
+import { TimeHorizonToggle } from "@/components/calculator/TimeHorizonToggle";
+
 export default function Home() {
+  const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
+
+  const outputs = useMemo(() => calculateRoi(inputs), [inputs]);
+
+  function setInput<K extends keyof CalculatorInputs>(
+    key: K,
+    value: CalculatorInputs[K]
+  ) {
+    setInputs((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function setMotion(motion: SalesMotion) {
+    // When motion changes, reset motion specific defaults but keep volume,
+    // conversion rates, halo, and cost the visitor has tweaked.
+    const motionDefaults = getDefaultsForMotion(motion);
+    setInputs((prev) => ({
+      ...prev,
+      salesMotion: motion,
+      closeRate: motionDefaults.closeRate,
+      dealType: motionDefaults.dealType,
+      dealValue: motionDefaults.dealValue,
+      monthlySubscriptionValue: motionDefaults.monthlySubscriptionValue,
+      monthlyChurnRate: motionDefaults.monthlyChurnRate,
+    }));
+  }
+
+  function setTimeHorizon(horizon: TimeHorizon) {
+    setInputs((prev) => ({ ...prev, timeHorizonMonths: horizon }));
+  }
+
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(120,119,198,0.18),transparent_60%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,0,0,0.4)_100%)]"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% -20%, hsl(var(--brand-primary) / 0.18), transparent 60%)",
+        }}
       />
 
-      <main className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col justify-between px-6 py-12 sm:px-10 sm:py-16">
-        <header className="flex items-center gap-3">
-          <div className="h-2 w-2 rounded-full bg-emerald-400" />
-          <span className="text-sm font-medium tracking-tight text-zinc-400">
-            Omnivate
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16 md:py-20 space-y-20 sm:space-y-24">
+        {/* Header */}
+        <header className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-brand-electric" />
+            <span className="text-sm font-medium tracking-tight text-foreground/80">
+              Omnivate
+            </span>
+          </div>
+          <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+            ROI Calculator
           </span>
         </header>
 
-        <section className="flex flex-1 flex-col justify-center gap-10 py-20">
-          <div className="space-y-3">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
-              In development
-            </p>
-            <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-zinc-50 sm:text-5xl">
-              ROI Calculator
-            </h1>
-          </div>
-
-          <p className="max-w-xl text-balance text-lg leading-relaxed text-zinc-400">
-            A transparent model of the cold email funnel. Enter your numbers,
-            see the projected revenue lift, and understand exactly how each
-            stage compounds.
-          </p>
-
-          <div className="flex flex-col gap-2 text-sm text-zinc-500 sm:flex-row sm:items-center sm:gap-4">
-            <span className="font-mono text-zinc-600">Phase 2 of 5</span>
-            <span className="hidden text-zinc-700 sm:inline">·</span>
-            <span>Tooling and infrastructure</span>
+        {/* Hero */}
+        <section className="space-y-8">
+          <HeroNumber
+            roiMultiple={outputs.roiMultiple}
+            totalRevenueLow={outputs.totalRevenueLow}
+            totalRevenueHigh={outputs.totalRevenueHigh}
+            timeHorizonMonths={inputs.timeHorizonMonths}
+          />
+          <div className="flex items-center gap-3">
+            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Time horizon
+            </span>
+            <TimeHorizonToggle
+              value={inputs.timeHorizonMonths}
+              onValueChange={setTimeHorizon}
+            />
           </div>
         </section>
 
-        <footer className="flex flex-col gap-1 text-xs text-zinc-600">
-          <p>roi.omnivate.ai</p>
-          <p>Built by Omnivate AI</p>
+        {/* Controls + Funnel viz */}
+        <section className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-12">
+          <div className="lg:order-2">
+            <FunnelViz
+              contactsReached={outputs.contactsReachedPerMonth}
+              opens={outputs.opensPerMonth}
+              replies={outputs.repliesPerMonth}
+              positiveReplies={outputs.positiveRepliesPerMonth}
+              meetings={outputs.meetingsPerMonth}
+              deals={outputs.dealsPerMonth}
+              rates={{
+                open: inputs.openRate,
+                reply: inputs.replyRate,
+                positive: inputs.positiveReplyRate,
+                meeting: inputs.meetingBookingRate,
+                close: inputs.closeRate,
+              }}
+            />
+          </div>
+          <div className="lg:order-1">
+            <ControlsPanel
+              inputs={inputs}
+              onChange={setInput}
+              onMotionChange={setMotion}
+            />
+          </div>
+        </section>
+
+        {/* ROI summary */}
+        <RoiSummary
+          directRevenue={outputs.directRevenueAnnualised}
+          hiddenRevenue={outputs.hiddenRevenueAnnualised}
+          haloRevenue={outputs.haloRevenueAnnualised}
+          totalRevenue={outputs.totalRevenueAnnualised}
+          totalRevenueLow={outputs.totalRevenueLow}
+          totalRevenueHigh={outputs.totalRevenueHigh}
+          dealsPerMonth={outputs.dealsPerMonth}
+          hiddenDealsPerMonth={outputs.hiddenDealsPerMonth}
+          haloUpliftRate={inputs.haloUpliftRate}
+          timeHorizonMonths={inputs.timeHorizonMonths}
+        />
+
+        {/* Without vs with comparison */}
+        <ComparisonView
+          totalRevenue={outputs.totalRevenueAnnualised}
+          totalCost={outputs.omnivateCostAnnualised}
+          roiNet={outputs.roiNet}
+          roiMultiple={outputs.roiMultiple}
+          timeHorizonMonths={inputs.timeHorizonMonths}
+        />
+
+        {/* PDF capture */}
+        <PdfCaptureForm />
+
+        {/* Footer */}
+        <footer className="border-t border-border pt-8">
+          <div className="flex flex-col items-start justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
+            <p>Built by Omnivate AI</p>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://omnivate.ai/privacy-policy"
+                className="hover:text-foreground transition-colors"
+              >
+                Privacy
+              </a>
+              <span>roi.omnivate.ai</span>
+            </div>
+          </div>
         </footer>
-      </main>
+      </div>
     </div>
   );
 }
