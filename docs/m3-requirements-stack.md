@@ -14,9 +14,9 @@ The math behind the calculator was specified in M1. This document is about the v
 
 References used while writing this:
 
-* `docs/m1-cold-email-funnel.md` — funnel math and variable list
-* `https://omnivate.ai` — brand identity scrape (color palette, gradient system, voice)
-* `https://cold-email-roi-calculator.com` — structural patterns to inspire and patterns to deliberately avoid
+- `docs/m1-cold-email-funnel.md` — funnel math and variable list
+- `https://omnivate.ai` — brand identity scrape (color palette, gradient system, voice)
+- `https://cold-email-roi-calculator.com` — structural patterns to inspire and patterns to deliberately avoid
 
 ---
 
@@ -28,55 +28,55 @@ This section is the source of truth for color, type, and motion across both the 
 
 Pulled directly from the omnivate.ai stylesheet. All values shown in HSL because that is what Tailwind v4 prefers; hex is included for design reference.
 
-| Token | HSL | Hex (approx) | Role |
-|---|---|---|---|
-| `brand-primary` | `263 70% 50%` | `#7C3AED` | Hero numbers, primary CTA, active funnel stages, headline glow |
-| `brand-secondary` | `271 65% 45%` | `#7E22CE` | Gradient anchor, deeper purple for hover and pressed states |
-| `brand-accent` | `280 75% 55%` | `#A855F7` | Mid gradient stop, highlight pills, secondary CTA |
-| `brand-electric` | `285 80% 60%` | `#C026D3` | Sparingly used: emphasis on the headline ROI number, sensitivity band ceiling |
-| `brand-sunset` | `45 100% 70%` | `#FBBF24` | Reserved for the "with Omnivate" delta in side by side comparison and the final headline ROI multiple. Single warm pop against the cool purple field. |
-| `surface-base` | `0 0% 4%` | `#0A0A0A` | Page background |
-| `surface-raised` | `222 84% 5%` | `#0B0F19` | Card surface |
-| `surface-overlay` | `220 14% 12%` | `#1F2937` | Tooltip and popover background |
-| `text-primary` | `0 0% 98%` | `#FAFAFA` | Body text |
-| `text-secondary` | `220 9% 65%` | `#A1A5AC` | Helper copy, axis labels |
-| `text-muted` | `220 9% 45%` | `#6B7180` | Disabled, footer |
-| `border` | `220 14% 18%` | `#262E3D` | Card edges, dividers |
-| `success` | `142 71% 45%` | `#22C55E` | Reserved for confirmation states ("Your PDF is on its way") |
-| `warning` | `38 92% 50%` | `#F59E0B` | Reserved for edge case warnings (e.g., "100% churn produces zero LTV") |
-| `error` | `0 84% 60%` | `#EF4444` | Form validation errors only |
+| Token             | HSL           | Hex (approx) | Role                                                                                                                                                  |
+| ----------------- | ------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `brand-primary`   | `263 70% 50%` | `#7C3AED`    | Hero numbers, primary CTA, active funnel stages, headline glow                                                                                        |
+| `brand-secondary` | `271 65% 45%` | `#7E22CE`    | Gradient anchor, deeper purple for hover and pressed states                                                                                           |
+| `brand-accent`    | `280 75% 55%` | `#A855F7`    | Mid gradient stop, highlight pills, secondary CTA                                                                                                     |
+| `brand-electric`  | `285 80% 60%` | `#C026D3`    | Sparingly used: emphasis on the headline ROI number, sensitivity band ceiling                                                                         |
+| `brand-sunset`    | `45 100% 70%` | `#FBBF24`    | Reserved for the "with Omnivate" delta in side by side comparison and the final headline ROI multiple. Single warm pop against the cool purple field. |
+| `surface-base`    | `0 0% 4%`     | `#0A0A0A`    | Page background                                                                                                                                       |
+| `surface-raised`  | `222 84% 5%`  | `#0B0F19`    | Card surface                                                                                                                                          |
+| `surface-overlay` | `220 14% 12%` | `#1F2937`    | Tooltip and popover background                                                                                                                        |
+| `text-primary`    | `0 0% 98%`    | `#FAFAFA`    | Body text                                                                                                                                             |
+| `text-secondary`  | `220 9% 65%`  | `#A1A5AC`    | Helper copy, axis labels                                                                                                                              |
+| `text-muted`      | `220 9% 45%`  | `#6B7180`    | Disabled, footer                                                                                                                                      |
+| `border`          | `220 14% 18%` | `#262E3D`    | Card edges, dividers                                                                                                                                  |
+| `success`         | `142 71% 45%` | `#22C55E`    | Reserved for confirmation states ("Your PDF is on its way")                                                                                           |
+| `warning`         | `38 92% 50%`  | `#F59E0B`    | Reserved for edge case warnings (e.g., "100% churn produces zero LTV")                                                                                |
+| `error`           | `0 84% 60%`   | `#EF4444`    | Form validation errors only                                                                                                                           |
 
 ### Gradient system
 
-| Gradient | Definition | Usage |
-|---|---|---|
-| `primary` | `linear-gradient(135deg, hsl(263 70% 50%), hsl(271 65% 45%))` | Hero ROI number background, primary button fill |
-| `accent` | `linear-gradient(135deg, hsl(280 75% 55%), hsl(285 80% 60%))` | Funnel stage highlights, animated transitions |
+| Gradient      | Definition                                                                               | Usage                                                           |
+| ------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `primary`     | `linear-gradient(135deg, hsl(263 70% 50%), hsl(271 65% 45%))`                            | Hero ROI number background, primary button fill                 |
+| `accent`      | `linear-gradient(135deg, hsl(280 75% 55%), hsl(285 80% 60%))`                            | Funnel stage highlights, animated transitions                   |
 | `radial-glow` | `radial-gradient(ellipse 80% 60% at 50% -20%, hsl(263 70% 50% / 0.18), transparent 60%)` | Page top ambient glow (already used on the M2 placeholder page) |
 
 ### Shadow system (signature look)
 
-| Shadow | Definition | Usage |
-|---|---|---|
-| `glow-soft` | `0 0 40px hsl(263 70% 50% / 0.4)` | Hover states on primary CTA |
-| `glow-strong` | `0 0 60px hsl(263 70% 50% / 0.6)` | Hero ROI number container |
-| `card` | `0 4px 6px -1px hsl(220 43% 11% / 0.1), 0 2px 4px -1px hsl(220 43% 11% / 0.06)` | Default card elevation |
-| `card-hover` | `0 20px 25px -5px hsl(220 43% 11% / 0.1), 0 10px 10px -5px hsl(220 43% 11% / 0.04)` | Card hover lift |
+| Shadow        | Definition                                                                          | Usage                       |
+| ------------- | ----------------------------------------------------------------------------------- | --------------------------- |
+| `glow-soft`   | `0 0 40px hsl(263 70% 50% / 0.4)`                                                   | Hover states on primary CTA |
+| `glow-strong` | `0 0 60px hsl(263 70% 50% / 0.6)`                                                   | Hero ROI number container   |
+| `card`        | `0 4px 6px -1px hsl(220 43% 11% / 0.1), 0 2px 4px -1px hsl(220 43% 11% / 0.06)`     | Default card elevation      |
+| `card-hover`  | `0 20px 25px -5px hsl(220 43% 11% / 0.1), 0 10px 10px -5px hsl(220 43% 11% / 0.04)` | Card hover lift             |
 
 ### Typography
 
 Omnivate's website uses the system sans serif stack with no custom font. We can do better without losing brand consistency. Recommendation: pair **Geist Sans** (already loaded in M2 scaffold via `next/font/google`) for body and headlines with **Geist Mono** for numeric output.
 
-| Use | Font | Weight | Size scale (mobile → desktop) |
-|---|---|---|---|
-| Hero ROI number | Geist Sans | 700 | 4rem → 6rem |
-| Section heading | Geist Sans | 600 | 1.875rem → 2.25rem |
-| Subsection heading | Geist Sans | 600 | 1.25rem → 1.5rem |
-| Input label | Geist Sans | 500 | 0.875rem |
-| Helper copy | Geist Sans | 400 | 0.75rem |
-| Body | Geist Sans | 400 | 1rem → 1.125rem |
-| Numeric output (funnel stages, summary numbers) | Geist Mono | 500 | varies; tabular figures |
-| Eyebrow / category label | Geist Sans | 500 | 0.75rem, `letter-spacing: 0.2em`, `text-transform: uppercase` |
+| Use                                             | Font       | Weight | Size scale (mobile → desktop)                                 |
+| ----------------------------------------------- | ---------- | ------ | ------------------------------------------------------------- |
+| Hero ROI number                                 | Geist Sans | 700    | 4rem → 6rem                                                   |
+| Section heading                                 | Geist Sans | 600    | 1.875rem → 2.25rem                                            |
+| Subsection heading                              | Geist Sans | 600    | 1.25rem → 1.5rem                                              |
+| Input label                                     | Geist Sans | 500    | 0.875rem                                                      |
+| Helper copy                                     | Geist Sans | 400    | 0.75rem                                                       |
+| Body                                            | Geist Sans | 400    | 1rem → 1.125rem                                               |
+| Numeric output (funnel stages, summary numbers) | Geist Mono | 500    | varies; tabular figures                                       |
+| Eyebrow / category label                        | Geist Sans | 500    | 0.75rem, `letter-spacing: 0.2em`, `text-transform: uppercase` |
 
 ### Motion language
 
@@ -90,10 +90,10 @@ Animations should feel like data settling, not decoration. Three rules:
 
 Calculator is for serious decision makers, not casual visitors. Density is moderate, not airy.
 
-* Base spacing unit: `0.25rem` (4 pixels)
-* Default vertical rhythm between sections: `4rem` (64 pixels)
-* Default horizontal padding on cards: `1.5rem` (24 pixels)
-* Default content max width: `1280px` for the calculator section, `48rem` for hero and PDF CTA sections
+- Base spacing unit: `0.25rem` (4 pixels)
+- Default vertical rhythm between sections: `4rem` (64 pixels)
+- Default horizontal padding on cards: `1.5rem` (24 pixels)
+- Default content max width: `1280px` for the calculator section, `48rem` for hero and PDF CTA sections
 
 ### Theme
 
@@ -198,8 +198,8 @@ The page is a single scroll, no tabs. Every section flows from top to bottom in 
 
 ### Sticky behavior
 
-* On mobile (below 768 pixels wide): the hero ROI multiple becomes a sticky bar at the top of the viewport once the user scrolls past it. So as they tweak inputs, the headline number stays visible.
-* On desktop: nothing is sticky. The funnel viz and summary stay in view because of the two column layout.
+- On mobile (below 768 pixels wide): the hero ROI multiple becomes a sticky bar at the top of the viewport once the user scrolls past it. So as they tweak inputs, the headline number stays visible.
+- On desktop: nothing is sticky. The funnel viz and summary stay in view because of the two column layout.
 
 ### Mobile breakdown
 
@@ -219,71 +219,71 @@ Every input the visitor controls. Defaults reflect the worked example in M1 (sal
 
 ### Sales motion (toggle)
 
-| Spec | Value |
-|---|---|
-| Type | Two state toggle |
-| Default | `sales_led` |
-| Options | `sales_led`, `self_service` |
-| Helper text on label | "Pick the closest match to how you sell." |
-| On change | Resets `close_rate`, `monthly_churn_rate`, `deal_type`, `deal_value`, `monthly_subscription_value` to motion specific defaults (see `## Sales motion presets` below). The visitor can still override individual rates after switching. |
+| Spec                 | Value                                                                                                                                                                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type                 | Two state toggle                                                                                                                                                                                                                       |
+| Default              | `sales_led`                                                                                                                                                                                                                            |
+| Options              | `sales_led`, `self_service`                                                                                                                                                                                                            |
+| Helper text on label | "Pick the closest match to how you sell."                                                                                                                                                                                              |
+| On change            | Resets `close_rate`, `monthly_churn_rate`, `deal_type`, `deal_value`, `monthly_subscription_value` to motion specific defaults (see `## Sales motion presets` below). The visitor can still override individual rates after switching. |
 
 ### Volume inputs
 
-| Variable | Type | Default | Range | Units | Helper text |
-|---|---|---|---|---|---|
-| `domains` | Slider with numeric input | 10 | 1 to 100 | count | "How many sending domains you run." |
-| `mailboxes_per_domain` | Slider with numeric input | 3 | 1 to 5 | count | "Mailboxes on each domain. Two to three is standard." |
-| `emails_per_mailbox_per_day` | Slider with numeric input | 30 | 10 to 50 | count | "Cold emails per mailbox per day after warmup. Industry safe limit is around thirty." |
-| `working_days_per_month` | Slider with numeric input | 22 | 15 to 25 | days | "Business days per month." |
-| `sequence_steps` | Slider with numeric input | 4 | 1 to 8 | count | "Total emails one prospect receives." |
+| Variable                     | Type                      | Default | Range    | Units | Helper text                                                                           |
+| ---------------------------- | ------------------------- | ------- | -------- | ----- | ------------------------------------------------------------------------------------- |
+| `domains`                    | Slider with numeric input | 10      | 1 to 100 | count | "How many sending domains you run."                                                   |
+| `mailboxes_per_domain`       | Slider with numeric input | 3       | 1 to 5   | count | "Mailboxes on each domain. Two to three is standard."                                 |
+| `emails_per_mailbox_per_day` | Slider with numeric input | 30      | 10 to 50 | count | "Cold emails per mailbox per day after warmup. Industry safe limit is around thirty." |
+| `working_days_per_month`     | Slider with numeric input | 22      | 15 to 25 | days  | "Business days per month."                                                            |
+| `sequence_steps`             | Slider with numeric input | 4       | 1 to 8   | count | "Total emails one prospect receives."                                                 |
 
 All sliders show the current value to the right of the label and accept direct numeric typing as well as drag.
 
 ### Conversion rates
 
-| Variable | Type | Default | Range | Units | Helper text |
-|---|---|---|---|---|---|
-| `open_rate` | Slider with numeric input | 55 | 0 to 100 | percent | "Percent of contacts who open at least one email." |
-| `reply_rate` | Slider with numeric input | 5 | 0 to 100 | percent | "Percent of contacts who reply at all." |
-| `positive_reply_rate` | Slider with numeric input | 30 | 0 to 100 | percent | "Percent of replies that are interested rather than dismissive." |
-| `meeting_booking_rate` | Slider with numeric input | 70 | 0 to 100 | percent | "Percent of positive replies that turn into a calendar meeting." |
-| `close_rate` | Slider with numeric input | 18 (sales led) or 30 (self service) | 0 to 100 | percent | "Percent of meetings that close to deals." |
+| Variable               | Type                      | Default                             | Range    | Units   | Helper text                                                      |
+| ---------------------- | ------------------------- | ----------------------------------- | -------- | ------- | ---------------------------------------------------------------- |
+| `open_rate`            | Slider with numeric input | 55                                  | 0 to 100 | percent | "Percent of contacts who open at least one email."               |
+| `reply_rate`           | Slider with numeric input | 5                                   | 0 to 100 | percent | "Percent of contacts who reply at all."                          |
+| `positive_reply_rate`  | Slider with numeric input | 30                                  | 0 to 100 | percent | "Percent of replies that are interested rather than dismissive." |
+| `meeting_booking_rate` | Slider with numeric input | 70                                  | 0 to 100 | percent | "Percent of positive replies that turn into a calendar meeting." |
+| `close_rate`           | Slider with numeric input | 18 (sales led) or 30 (self service) | 0 to 100 | percent | "Percent of meetings that close to deals."                       |
 
 ### Deal economics
 
-| Variable | Type | Default | Range | Units | Helper text | When shown |
-|---|---|---|---|---|---|---|
-| `deal_type` | Two state toggle | `one_time` (sales led) or `subscription` (self service) | `one_time`, `subscription` | none | "One time deal or recurring subscription." | Always |
-| `deal_value` | Numeric input | 25000 | 100 to 1000000 | USD | "Average deal value for one time deals or annualised contract value for subscriptions sold annually." | When `deal_type = one_time` |
-| `monthly_subscription_value` | Numeric input | 200 | 10 to 10000 | USD per month | "Monthly subscription price." | When `deal_type = subscription` |
-| `monthly_churn_rate` | Slider with numeric input | 2 (sales led) or 5 (self service) | 0 to 100 | percent | "Percent of customers who cancel each month." | When `deal_type = subscription` |
+| Variable                     | Type                      | Default                                                 | Range                      | Units         | Helper text                                                                                           | When shown                      |
+| ---------------------------- | ------------------------- | ------------------------------------------------------- | -------------------------- | ------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `deal_type`                  | Two state toggle          | `one_time` (sales led) or `subscription` (self service) | `one_time`, `subscription` | none          | "One time deal or recurring subscription."                                                            | Always                          |
+| `deal_value`                 | Numeric input             | 25000                                                   | 100 to 1000000             | USD           | "Average deal value for one time deals or annualised contract value for subscriptions sold annually." | When `deal_type = one_time`     |
+| `monthly_subscription_value` | Numeric input             | 200                                                     | 10 to 10000                | USD per month | "Monthly subscription price."                                                                         | When `deal_type = subscription` |
+| `monthly_churn_rate`         | Slider with numeric input | 2 (sales led) or 5 (self service)                       | 0 to 100                   | percent       | "Percent of customers who cancel each month."                                                         | When `deal_type = subscription` |
 
 ### Halo effects
 
-| Variable | Type | Default | Range | Units | Helper text |
-|---|---|---|---|---|---|
-| `hidden_conversion_rate` | Slider with numeric input | 0.3 | 0 to 1 | percent | "Percent of engaged silent contacts who convert later." |
-| `halo_uplift_rate` | Slider with numeric input | 8 | 0 to 20 | percent | "Additional pipeline generated by halo effects beyond the direct funnel." |
+| Variable                 | Type                      | Default | Range   | Units   | Helper text                                                               |
+| ------------------------ | ------------------------- | ------- | ------- | ------- | ------------------------------------------------------------------------- |
+| `hidden_conversion_rate` | Slider with numeric input | 0.3     | 0 to 1  | percent | "Percent of engaged silent contacts who convert later."                   |
+| `halo_uplift_rate`       | Slider with numeric input | 8       | 0 to 20 | percent | "Additional pipeline generated by halo effects beyond the direct funnel." |
 
 ### Cost
 
-| Variable | Type | Default | Range | Units | Helper text |
-|---|---|---|---|---|---|
-| `omnivate_monthly_fee` | Numeric input | 4000 | 1000 to 20000 | USD per month | "Monthly cost of running outbound through Omnivate. Adjust to test ROI at different price points." |
+| Variable               | Type          | Default | Range         | Units         | Helper text                                                                                        |
+| ---------------------- | ------------- | ------- | ------------- | ------------- | -------------------------------------------------------------------------------------------------- |
+| `omnivate_monthly_fee` | Numeric input | 4000    | 1000 to 20000 | USD per month | "Monthly cost of running outbound through Omnivate. Adjust to test ROI at different price points." |
 
 ### Display preferences
 
-| Variable | Type | Default | Range | Units | Helper text |
-|---|---|---|---|---|---|
-| `time_horizon_months` | Three state toggle | 12 | 6, 12, 24 | months | None visible on the toggle. Tooltip on hover: "How far out to project revenue." |
+| Variable              | Type               | Default | Range     | Units  | Helper text                                                                     |
+| --------------------- | ------------------ | ------- | --------- | ------ | ------------------------------------------------------------------------------- |
+| `time_horizon_months` | Three state toggle | 12      | 6, 12, 24 | months | None visible on the toggle. Tooltip on hover: "How far out to project revenue." |
 
 ### PDF capture (form, not in main controls)
 
-| Variable | Type | Default | Required | Validation |
-|---|---|---|---|---|
-| `email` | Email input | empty | yes | Must match an email regex. Reject obviously disposable domains (`mailinator`, `tempmail`, `10minutemail`, plus a small allow list per Phase 5 anti abuse) |
-| `name` | Text input | empty | yes | 2 to 80 characters |
-| `company_name` | Text input | empty | no | 0 to 100 characters. When present, used to personalise the PDF and the hero headline ("…can generate for {Company}") |
+| Variable       | Type        | Default | Required | Validation                                                                                                                                                |
+| -------------- | ----------- | ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `email`        | Email input | empty   | yes      | Must match an email regex. Reject obviously disposable domains (`mailinator`, `tempmail`, `10minutemail`, plus a small allow list per Phase 5 anti abuse) |
+| `name`         | Text input  | empty   | yes      | 2 to 80 characters                                                                                                                                        |
+| `company_name` | Text input  | empty   | no       | 0 to 100 characters. When present, used to personalise the PDF and the hero headline ("…can generate for {Company}")                                      |
 
 ---
 
@@ -293,23 +293,23 @@ When the visitor toggles between sales motions, the following defaults reset. Th
 
 ### Sales-led
 
-| Variable | Default |
-|---|---|
-| `close_rate` | 18 percent |
-| `deal_type` | `one_time` |
-| `deal_value` | 25000 USD |
+| Variable             | Default                                                               |
+| -------------------- | --------------------------------------------------------------------- |
+| `close_rate`         | 18 percent                                                            |
+| `deal_type`          | `one_time`                                                            |
+| `deal_value`         | 25000 USD                                                             |
 | `monthly_churn_rate` | 2 percent (only used if visitor switches `deal_type` to subscription) |
 
 Rationale: high touch B2B sales, larger deals, longer sales cycles. Lower close rates because more decision makers, but bigger deal size compensates.
 
 ### Self-service SaaS
 
-| Variable | Default |
-|---|---|
-| `close_rate` | 30 percent |
-| `deal_type` | `subscription` |
+| Variable                     | Default           |
+| ---------------------------- | ----------------- |
+| `close_rate`                 | 30 percent        |
+| `deal_type`                  | `subscription`    |
 | `monthly_subscription_value` | 200 USD per month |
-| `monthly_churn_rate` | 5 percent |
+| `monthly_churn_rate`         | 5 percent         |
 
 Rationale: lower touch, shorter cycle, smaller recurring deals. Higher close rate because product trial closes the deal more efficiently than meetings alone.
 
@@ -325,10 +325,10 @@ Per Omar's standup decision: the pricing input is a configurable visible input. 
 
 ### Behaviour
 
-* Visitor sees a numeric input labelled "Omnivate fee per month" with default 4000 and a USD prefix
-* Helper text: "Monthly cost of running outbound through Omnivate. Adjust to test ROI at different price points."
-* Validation: 1000 to 20000 USD per month
-* Used in: `omnivate_cost_annualised = omnivate_monthly_fee × 12` and downstream `roi_multiple` and `roi_net`
+- Visitor sees a numeric input labelled "Omnivate fee per month" with default 4000 and a USD prefix
+- Helper text: "Monthly cost of running outbound through Omnivate. Adjust to test ROI at different price points."
+- Validation: 1000 to 20000 USD per month
+- Used in: `omnivate_cost_annualised = omnivate_monthly_fee × 12` and downstream `roi_multiple` and `roi_net`
 
 ### Future state
 
@@ -348,20 +348,20 @@ Every number the calculator displays. Formulas reference variables defined above
 
 ### Capacity and reach
 
-| Output | Formula (plain English) | Formula (code) | Display location |
-|---|---|---|---|
-| `monthly_sending_capacity` | Domains times mailboxes per domain times emails per mailbox per day times working days per month | `domains * mailboxes_per_domain * emails_per_mailbox_per_day * working_days_per_month` | Tooltip on the volume controls section |
-| `contacts_reached_per_month` | Monthly capacity divided by sequence steps | `monthly_sending_capacity / sequence_steps` | Funnel stage 0 |
+| Output                       | Formula (plain English)                                                                          | Formula (code)                                                                         | Display location                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | -------------------------------------- |
+| `monthly_sending_capacity`   | Domains times mailboxes per domain times emails per mailbox per day times working days per month | `domains * mailboxes_per_domain * emails_per_mailbox_per_day * working_days_per_month` | Tooltip on the volume controls section |
+| `contacts_reached_per_month` | Monthly capacity divided by sequence steps                                                       | `monthly_sending_capacity / sequence_steps`                                            | Funnel stage 0                         |
 
 ### Funnel stages
 
-| Output | Formula | Display location |
-|---|---|---|
-| `opens_per_month` | `contacts_reached_per_month * open_rate / 100` | Funnel stage 1 |
-| `replies_per_month` | `contacts_reached_per_month * reply_rate / 100` | Funnel stage 2 |
-| `positive_replies_per_month` | `replies_per_month * positive_reply_rate / 100` | Funnel stage 3 |
-| `meetings_per_month` | `positive_replies_per_month * meeting_booking_rate / 100` | Funnel stage 4 |
-| `deals_per_month` | `meetings_per_month * close_rate / 100` | Funnel stage 5 |
+| Output                       | Formula                                                   | Display location |
+| ---------------------------- | --------------------------------------------------------- | ---------------- |
+| `opens_per_month`            | `contacts_reached_per_month * open_rate / 100`            | Funnel stage 1   |
+| `replies_per_month`          | `contacts_reached_per_month * reply_rate / 100`           | Funnel stage 2   |
+| `positive_replies_per_month` | `replies_per_month * positive_reply_rate / 100`           | Funnel stage 3   |
+| `meetings_per_month`         | `positive_replies_per_month * meeting_booking_rate / 100` | Funnel stage 4   |
+| `deals_per_month`            | `meetings_per_month * close_rate / 100`                   | Funnel stage 5   |
 
 ### Direct revenue
 
@@ -449,9 +449,9 @@ Already specified in `## Computed outputs`. Default `hidden_conversion_rate` is 
 
 Lives in the ROI Summary section as the middle column of three. Card displays:
 
-* Number of hidden deals per month
-* Annualised revenue from hidden pipeline
-* Tooltip explaining the calculation
+- Number of hidden deals per month
+- Annualised revenue from hidden pipeline
+- Tooltip explaining the calculation
 
 ### Assumptions documented for the visitor
 
@@ -475,9 +475,9 @@ Already specified in `## Computed outputs`. Default `halo_uplift_rate` is 8 perc
 
 Right column of the three column summary. Card displays:
 
-* Halo uplift percentage applied
-* Annualised revenue from halo
-* Tooltip explaining the calculation
+- Halo uplift percentage applied
+- Annualised revenue from halo
+- Tooltip explaining the calculation
 
 ### Tooltip copy
 
@@ -531,16 +531,16 @@ A vertical bar funnel. Each stage is a horizontal bar on a card. Bar width is pr
 
 ### Bar styling
 
-* Bar fill: `primary` gradient (purple to deeper purple)
-* Bar background: `border` color at 30% opacity
-* Conversion percentage between stages: shown in `text-secondary` with `▼` arrow
-* Numbers: `Geist Mono`, tabular figures, right aligned
+- Bar fill: `primary` gradient (purple to deeper purple)
+- Bar background: `border` color at 30% opacity
+- Conversion percentage between stages: shown in `text-secondary` with `▼` arrow
+- Numbers: `Geist Mono`, tabular figures, right aligned
 
 ### Animation
 
-* On first paint, bars cascade in from left with 60 millisecond stagger
-* On input change, bars tween width and number with 300 millisecond ease
-* When a stage drops to zero (e.g., user sets `reply_rate = 0`), the bar shrinks to a 1 pixel sliver to maintain layout consistency
+- On first paint, bars cascade in from left with 60 millisecond stagger
+- On input change, bars tween width and number with 300 millisecond ease
+- When a stage drops to zero (e.g., user sets `reply_rate = 0`), the bar shrinks to a 1 pixel sliver to maintain layout consistency
 
 ### Hover behaviour
 
@@ -588,9 +588,9 @@ The PDF is what the visitor walks away with and shows their boss. It is a one to
 
 ### Format
 
-* Page size: US Letter (8.5 by 11 inches)
-* Orientation: portrait
-* File name: `Omnivate-ROI-Projection-{CompanyName}-{YYYY-MM-DD}.pdf` (or `Omnivate-ROI-Projection-{YYYY-MM-DD}.pdf` if no company name)
+- Page size: US Letter (8.5 by 11 inches)
+- Orientation: portrait
+- File name: `Omnivate-ROI-Projection-{CompanyName}-{YYYY-MM-DD}.pdf` (or `Omnivate-ROI-Projection-{YYYY-MM-DD}.pdf` if no company name)
 
 ### Sections
 
@@ -613,30 +613,30 @@ The PDF is what the visitor walks away with and shows their boss. It is a one to
 
 ### Branding
 
-* Page background: white
-* Accent color: `brand-primary #7C3AED`
-* Headers: Geist Sans bold
-* Numbers: Geist Mono
-* Tables: thin borders, alternating row backgrounds at `surface-overlay` 5% opacity
-* Wordmark: SVG version of the Omnivate logo if available; otherwise "Omnivate" set in Geist Sans bold with `brand-primary` letter spacing
+- Page background: white
+- Accent color: `brand-primary #7C3AED`
+- Headers: Geist Sans bold
+- Numbers: Geist Mono
+- Tables: thin borders, alternating row backgrounds at `surface-overlay` 5% opacity
+- Wordmark: SVG version of the Omnivate logo if available; otherwise "Omnivate" set in Geist Sans bold with `brand-primary` letter spacing
 
 ### Generator
 
 Choosing `@react-pdf/renderer` for the PDF generation in M5. Reasons:
 
-* Component based, matches our React stack
-* Renders inside Vercel functions cleanly with no headless browser overhead
-* Comparable visual fidelity to Puppeteer for our layout needs
-* Smaller deploy footprint than Puppeteer
-* Open source, no per generation cost like PDFShift
+- Component based, matches our React stack
+- Renders inside Vercel functions cleanly with no headless browser overhead
+- Comparable visual fidelity to Puppeteer for our layout needs
+- Smaller deploy footprint than Puppeteer
+- Open source, no per generation cost like PDFShift
 
 ### Hosted vs attached
 
 The PDF is generated server side and stored as a hosted file (Supabase Storage or Vercel Blob). The Smartlead email links to the hosted PDF rather than attaching it. Reasons:
 
-* Smartlead attachment limits and deliverability concerns
-* Hosted link allows the visitor to forward the URL without the file size hit
-* Allows future revisions if we improve PDF design
+- Smartlead attachment limits and deliverability concerns
+- Hosted link allows the visitor to forward the URL without the file size hit
+- Allows future revisions if we improve PDF design
 
 ---
 
@@ -646,43 +646,43 @@ The PDF is generated server side and stored as a hosted file (Supabase Storage o
 
 If `deals_per_month` rounds to zero (because input rates produce a tiny number), the calculator displays:
 
-* `deals_per_month` as `0` not `0.something`
-* `direct_revenue_annualised` as `$0`
-* Hidden pipeline and halo bonus as `$0`
-* Hero ROI multiple as `0×`
-* Sensitivity band as `Between $0 and $0`
-* No error states; this is a valid (if grim) outcome
+- `deals_per_month` as `0` not `0.something`
+- `direct_revenue_annualised` as `$0`
+- Hidden pipeline and halo bonus as `$0`
+- Hero ROI multiple as `0×`
+- Sensitivity band as `Between $0 and $0`
+- No error states; this is a valid (if grim) outcome
 
 ### 100 percent monthly churn
 
 If `monthly_churn_rate = 100` (visitor pushes the slider all the way):
 
-* `average_lifetime_months = 1 / 1 = 1` month, which is mathematically valid
-* `customer_ltv = monthly_subscription_value * 1`
-* No special handling beyond standard math
-* Tooltip warning on the churn input: "100% monthly churn means each customer cancels in their first month."
+- `average_lifetime_months = 1 / 1 = 1` month, which is mathematically valid
+- `customer_ltv = monthly_subscription_value * 1`
+- No special handling beyond standard math
+- Tooltip warning on the churn input: "100% monthly churn means each customer cancels in their first month."
 
 ### Zero churn
 
 If `monthly_churn_rate = 0`:
 
-* `average_lifetime_months` would be infinite mathematically
-* We cap at 60 months per the M1 spec
-* Tooltip on the displayed lifetime value: "Lifetime capped at 60 months for sane projections."
+- `average_lifetime_months` would be infinite mathematically
+- We cap at 60 months per the M1 spec
+- Tooltip on the displayed lifetime value: "Lifetime capped at 60 months for sane projections."
 
 ### Tiny deal value
 
 If `deal_value < 1000` or `monthly_subscription_value < 50`:
 
-* No special handling, math just produces small numbers
-* Optional copy in the tooltip: "ROI math still works at small deal sizes; volume becomes the dominant factor."
+- No special handling, math just produces small numbers
+- Optional copy in the tooltip: "ROI math still works at small deal sizes; volume becomes the dominant factor."
 
 ### Huge volumes
 
 If `domains > 50` or `monthly_sending_capacity > 100,000`:
 
-* No technical issue; numbers get large
-* Add a sanity warning copy near the volume input: "Programs at this scale typically require dedicated deliverability operations beyond what most setups handle."
+- No technical issue; numbers get large
+- Add a sanity warning copy near the volume input: "Programs at this scale typically require dedicated deliverability operations beyond what most setups handle."
 
 ### Partial deal counts
 
@@ -700,42 +700,7 @@ If the visitor clicks "Send me the PDF" with empty email, show inline validation
 
 If the PDF generation API route throws an error in M5:
 
-* Show inline error: "Something went wrong generating your PDF. We have logged it and will email you the projection within an hour."
-* Server side: log the error to Vercel logs, and (if Supabase persistence is wired) save the lead anyway so we can manually fix and send
+- Show inline error: "Something went wrong generating your PDF. We have logged it and will email you the projection within an hour."
+- Server side: log the error to Vercel logs, and (if Supabase persistence is wired) save the lead anyway so we can manually fix and send
 
 ---
-
-## Decisions confirmed by Omar
-
-All ten open decisions resolved. Captured here for the record.
-
-1. **Pricing input visibility:** Visible to the visitor with a default of 4,000 USD per month. Visitors can adjust to test ROI at different price points. Hardcode and hide once a final price is settled.
-2. **Sensitivity band variance:** Plus or minus 10% on each conversion rate. Confirmed.
-3. **Hidden pipeline default:** 0.3% conservative. Confirmed.
-4. **Halo uplift default:** 8% conservative. Confirmed.
-5. **Subscription dual display:** Show both annualised MRR added and lifetime value cohort revenue for SaaS deals. Confirmed.
-6. **PDF delivery via Smartlead:** Hosted PDF link delivered in a single transactional Smartlead email. No follow up sequence. Confirmed.
-7. **Light theme only:** Confirmed. No dark mode toggle.
-8. **Branded PDF logo:** Omnivate logo provided. Saved at `public/omnivate-logo.png` (PNG, 23KB). Logo is the purple brain-circuit mark plus the "Omnivate AI" wordmark on a black square background, matching the brand palette already specified in this document. The mark uses the same vivid purple as `brand-primary` so it integrates cleanly with the rest of the visual system.
-9. **Footer privacy link:** Points to `https://omnivate.ai/privacy-policy`. Confirmed by Omar.
-10. **Loom recording cadence:** One five minute Loom per phase, recorded by Sheriff and shared with Omar via Slack at the end of each mini project. Confirmed.
-
----
-
-## Outstanding for M3 sign off
-
-* [x] Visual identity defined with palette, gradients, shadows, type, motion, density
-* [x] Page layout wireframed top to bottom
-* [x] Every visitor input documented with type, default, range, units, helper text
-* [x] Every output number defined with formula
-* [x] Sales motion presets specified
-* [x] Pricing input behaviour specified
-* [x] Hidden pipeline and halo bonus formulas locked
-* [x] Funnel visualisation styled and animated
-* [x] PDF output spec including sections, branding, and generator choice
-* [x] Edge cases enumerated with handling
-* [x] All ten open decisions confirmed by Omar
-* [x] Omnivate logo file committed at `public/omnivate-logo.png`
-* [ ] M3 Loom recorded walking through the doc
-
-Phase 4 (M4 build the calculator) starts after Omar signs off on M3.
