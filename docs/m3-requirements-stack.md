@@ -716,8 +716,8 @@ All ten open decisions resolved. Captured here for the record.
 5. **Subscription dual display:** Show both annualised MRR added and lifetime value cohort revenue for SaaS deals. Confirmed.
 6. **PDF delivery via Smartlead:** Hosted PDF link delivered in a single transactional Smartlead email. No follow up sequence. Confirmed.
 7. **Light theme only:** Confirmed. No dark mode toggle.
-8. **Branded PDF logo:** Omnivate logo provided. Saved at `public/omnivate-logo.png` (SVG version if available preferred). Logo is the purple brain-circuit mark plus the "Omnivate AI" wordmark on a black square background, matching the brand palette already specified in this document.
-9. **Footer privacy link:** Points to `https://omnivate.ai/privacy`. (Pending visual verification that the page renders actual privacy content; the SPA returns HTTP 200 for every path so we cannot confirm via HTTP alone.)
+8. **Branded PDF logo:** Omnivate logo provided. Saved at `public/omnivate-logo.png` (PNG, 23KB). Logo is the purple brain-circuit mark plus the "Omnivate AI" wordmark on a black square background, matching the brand palette already specified in this document. The mark uses the same vivid purple as `brand-primary` so it integrates cleanly with the rest of the visual system.
+9. **Footer privacy link:** Points to `https://omnivate.ai/privacy-policy`. Confirmed by Omar.
 10. **Loom recording cadence:** One five minute Loom per phase, recorded by Sheriff and shared with Omar via Slack at the end of each mini project. Confirmed.
 
 ---
@@ -735,7 +735,7 @@ All ten open decisions resolved. Captured here for the record.
 * [x] PDF output spec including sections, branding, and generator choice
 * [x] Edge cases enumerated with handling
 * [x] All ten open decisions confirmed by Omar
-* [ ] Omnivate logo file committed at `public/omnivate-logo.png` (or `.svg`)
+* [x] Omnivate logo file committed at `public/omnivate-logo.png`
 * [ ] M3 Loom recorded walking through the doc
 
 Phase 4 (M4 build the calculator) starts after Omar signs off on M3.
