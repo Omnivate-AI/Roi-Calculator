@@ -1,9 +1,11 @@
 "use client";
 
 import type { CalculatorInputs } from "@/lib/types";
+import { formatCurrency, formatInteger } from "@/lib/utils";
 import { SalesMotionToggle } from "./SalesMotionToggle";
 import { SliderInput } from "./SliderInput";
 import { NumberInput } from "./NumberInput";
+import { Warning } from "./Warning";
 
 interface ControlsPanelProps {
   inputs: CalculatorInputs;
@@ -12,14 +14,29 @@ interface ControlsPanelProps {
     value: CalculatorInputs[K]
   ) => void;
   onMotionChange: (motion: CalculatorInputs["salesMotion"]) => void;
+  /**
+   * Subscription specific computed values, when applicable. Used to render
+   * the LTV badge under the churn slider so the visitor sees the consequence
+   * of their churn assumption immediately.
+   */
+  subscriptionInfo?: {
+    customerLtv: number;
+    averageLifetimeMonths: number;
+  } | null;
 }
 
 /**
  * The full panel of inputs the visitor controls. Grouped by category to
  * mirror the M3 spec: sales motion, volume, conversion rates, deal economics,
- * halo effects, and cost.
+ * halo effects, and cost. Inline warnings appear when an input value puts
+ * the calculator in an edge case (zero deals, 100% churn, tiny deal size).
  */
-export function ControlsPanel({ inputs, onChange, onMotionChange }: ControlsPanelProps) {
+export function ControlsPanel({
+  inputs,
+  onChange,
+  onMotionChange,
+  subscriptionInfo,
+}: ControlsPanelProps) {
   return (
     <div className="space-y-8">
       <SalesMotionToggle value={inputs.salesMotion} onValueChange={onMotionChange} />
@@ -106,29 +123,46 @@ export function ControlsPanel({ inputs, onChange, onMotionChange }: ControlsPane
           unit="%"
           onValueChange={(v) => onChange("meetingBookingRate", v)}
         />
-        <SliderInput
-          label="Close rate"
-          helper="Percent of meetings that close to deals."
-          value={inputs.closeRate}
-          min={0}
-          max={100}
-          unit="%"
-          onValueChange={(v) => onChange("closeRate", v)}
-        />
+        <div className="space-y-2">
+          <SliderInput
+            label="Close rate"
+            helper="Percent of meetings that close to deals."
+            value={inputs.closeRate}
+            min={0}
+            max={100}
+            unit="%"
+            onValueChange={(v) => onChange("closeRate", v)}
+          />
+          {inputs.closeRate === 0 && (
+            <Warning>
+              At zero percent close rate the program produces no deals. Even
+              the best meetings need to convert to revenue.
+            </Warning>
+          )}
+        </div>
       </Section>
 
       <Section title="Deal economics">
         {inputs.dealType === "one_time" ? (
-          <NumberInput
-            label="Deal value"
-            helper="Average deal value for one time deals or annualised contract value."
-            value={inputs.dealValue}
-            min={100}
-            max={1_000_000}
-            step={500}
-            prefix="$"
-            onValueChange={(v) => onChange("dealValue", v)}
-          />
+          <div className="space-y-2">
+            <NumberInput
+              label="Deal value"
+              helper="Average deal value for one time deals or annualised contract value."
+              value={inputs.dealValue}
+              min={100}
+              max={1_000_000}
+              step={500}
+              prefix="$"
+              onValueChange={(v) => onChange("dealValue", v)}
+            />
+            {inputs.dealValue < 1_000 && (
+              <Warning>
+                Deal value below one thousand dollars rarely justifies cold
+                outbound at this volume. Consider whether your offering fits
+                the channel.
+              </Warning>
+            )}
+          </div>
         ) : (
           <>
             <NumberInput
@@ -141,16 +175,41 @@ export function ControlsPanel({ inputs, onChange, onMotionChange }: ControlsPane
               prefix="$"
               onValueChange={(v) => onChange("monthlySubscriptionValue", v)}
             />
-            <SliderInput
-              label="Monthly churn rate"
-              helper="Percent of customers who cancel each month."
-              value={inputs.monthlyChurnRate}
-              min={0}
-              max={100}
-              step={0.5}
-              unit="%"
-              onValueChange={(v) => onChange("monthlyChurnRate", v)}
-            />
+            <div className="space-y-2">
+              <SliderInput
+                label="Monthly churn rate"
+                helper="Percent of customers who cancel each month."
+                value={inputs.monthlyChurnRate}
+                min={0}
+                max={100}
+                step={0.5}
+                unit="%"
+                onValueChange={(v) => onChange("monthlyChurnRate", v)}
+              />
+              {subscriptionInfo && (
+                <LtvBadge
+                  ltv={subscriptionInfo.customerLtv}
+                  lifetimeMonths={subscriptionInfo.averageLifetimeMonths}
+                  isCapped={
+                    inputs.monthlyChurnRate === 0 ||
+                    subscriptionInfo.averageLifetimeMonths >= 60
+                  }
+                />
+              )}
+              {inputs.monthlyChurnRate === 100 && (
+                <Warning>
+                  At one hundred percent monthly churn every customer cancels
+                  in their first month. Lifetime value collapses to a single
+                  month of subscription.
+                </Warning>
+              )}
+              {inputs.monthlyChurnRate >= 50 && inputs.monthlyChurnRate < 100 && (
+                <Warning>
+                  High churn rate. Lifetime is short which suppresses cohort
+                  revenue compared to lower churn benchmarks.
+                </Warning>
+              )}
+            </div>
           </>
         )}
       </Section>
@@ -205,6 +264,27 @@ function Section({ title, children }: SectionProps) {
         {title}
       </h3>
       <div className="space-y-5">{children}</div>
+    </div>
+  );
+}
+
+interface LtvBadgeProps {
+  ltv: number;
+  lifetimeMonths: number;
+  isCapped: boolean;
+}
+
+function LtvBadge({ ltv, lifetimeMonths, isCapped }: LtvBadgeProps) {
+  return (
+    <div className="rounded-md border border-border bg-secondary/40 px-3 py-2 text-xs leading-relaxed">
+      <span className="text-muted-foreground">Customer LTV:</span>{" "}
+      <span className="font-mono tabular-nums text-foreground">
+        {formatCurrency(ltv)}
+      </span>{" "}
+      <span className="text-muted-foreground">
+        over {formatInteger(lifetimeMonths)} months
+        {isCapped && " (capped at five years)"}
+      </span>
     </div>
   );
 }

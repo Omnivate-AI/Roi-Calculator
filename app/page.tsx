@@ -128,6 +128,7 @@ export default function Home() {
               positiveReplies={outputs.positiveRepliesPerMonth}
               meetings={outputs.meetingsPerMonth}
               deals={outputs.dealsPerMonth}
+              monthlySendingCapacity={outputs.monthlySendingCapacity}
               rates={{
                 open: inputs.openRate,
                 reply: inputs.replyRate,
@@ -142,6 +143,15 @@ export default function Home() {
               inputs={inputs}
               onChange={setInput}
               onMotionChange={setMotion}
+              subscriptionInfo={
+                outputs.customerLtv !== null &&
+                outputs.averageLifetimeMonths !== null
+                  ? {
+                      customerLtv: outputs.customerLtv,
+                      averageLifetimeMonths: outputs.averageLifetimeMonths,
+                    }
+                  : null
+              }
             />
           </div>
         </section>
@@ -179,6 +189,8 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <a
                 href="https://omnivate.ai/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-foreground transition-colors"
               >
                 Privacy

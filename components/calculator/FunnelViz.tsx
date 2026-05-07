@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { formatInteger, formatPercent } from "@/lib/utils";
 
 interface FunnelStage {
@@ -16,6 +19,7 @@ interface FunnelVizProps {
   positiveReplies: number;
   meetings: number;
   deals: number;
+  monthlySendingCapacity: number;
   rates: {
     open: number;
     reply: number;
@@ -28,8 +32,18 @@ interface FunnelVizProps {
 /**
  * Vertical bar funnel showing every stage with bar width proportional to volume
  * relative to the top stage. Conversion percentages between stages, in mono.
+ * On first paint, stages cascade in with a 60ms stagger per the M3 motion
+ * language. Subsequent updates use the existing CSS width transition.
  */
 export function FunnelViz(props: FunnelVizProps) {
+  // hasMounted flips after the first render so we can apply a one-shot cascade
+  // animation on initial paint, then let the bars tween in place via CSS
+  // transitions for any further input changes.
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const stages: FunnelStage[] = [
     { label: "Contacts reached", value: props.contactsReached },
     {
@@ -59,28 +73,44 @@ export function FunnelViz(props: FunnelVizProps) {
     },
   ];
 
-  const maxValue = stages[0].value || 1; // contacts reached, never zero in practice
+  const maxValue = stages[0].value || 1;
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-[0_1px_3px_0_hsl(220_43%_11%_/_0.06),_0_4px_16px_-4px_hsl(var(--brand-primary)/0.08)]">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             Funnel
           </p>
-          <h2 className="mt-1 text-lg font-semibold text-foreground">Per month, live</h2>
+          <h2 className="mt-1 text-lg font-semibold text-foreground">
+            Per month, live
+          </h2>
         </div>
-        <div className="hidden items-center gap-2 sm:flex">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand-electric animate-pulse" />
-          <span className="text-xs text-muted-foreground">Updates with every input change</span>
+        <div className="text-right">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Capacity
+          </p>
+          <p className="mt-1 font-mono text-sm tabular-nums text-foreground">
+            {formatInteger(props.monthlySendingCapacity)}
+            <span className="ml-1 text-muted-foreground">emails/mo</span>
+          </p>
         </div>
       </div>
 
       <div className="space-y-3">
         {stages.map((stage, index) => {
           const widthPercent = Math.max(2, (stage.value / maxValue) * 100);
+          const cascadeStyle = hasMounted
+            ? undefined
+            : ({
+                opacity: 0,
+                animation: `funnel-cascade 400ms cubic-bezier(0.16, 1, 0.3, 1) ${
+                  index * 60
+                }ms forwards`,
+              } as React.CSSProperties);
+
           return (
-            <div key={stage.label} className="space-y-1.5">
+            <div key={stage.label} className="space-y-1.5" style={cascadeStyle}>
               {stage.conversionFromPrevious && (
                 <div className="flex items-center gap-2 pl-1 text-xs text-muted-foreground">
                   <span className="font-mono tabular-nums">
@@ -97,7 +127,7 @@ export function FunnelViz(props: FunnelVizProps) {
                       width: `${widthPercent}%`,
                       background:
                         "linear-gradient(90deg, hsl(var(--brand-primary)) 0%, hsl(var(--brand-secondary)) 100%)",
-                      opacity: 0.85 - index * 0.04,
+                      opacity: 0.92 - index * 0.05,
                     }}
                   />
                 </div>
@@ -114,6 +144,14 @@ export function FunnelViz(props: FunnelVizProps) {
           );
         })}
       </div>
+
+      {/* Cascade keyframes scoped to this component. */}
+      <style>{`
+        @keyframes funnel-cascade {
+          from { opacity: 0; transform: translateX(-12px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+      `}</style>
     </div>
   );
 }
