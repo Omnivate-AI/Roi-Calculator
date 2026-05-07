@@ -18,20 +18,20 @@ Live URL: **https://roi-calculator-taupe-ten.vercel.app**
 
 Five stages, each landing as its own commit so the history reads as incremental progress:
 
-| Stage | Commit | What |
-|---|---|---|
-| 4.1 | `ca68cc1` | Math layer: pure `calculateRoi` function, types, defaults, 44 unit tests |
-| 4.2 | `13f6500` | shadcn/ui setup, Omnivate brand tokens, 11 calculator components, working page with state |
-| 4.3 | `10d3a89` | URL state persistence (shareable URLs), number tweening on outputs |
-| 4.4 | `df053df` | Edge case warnings, monthly capacity headline, LTV badge, funnel cascade animation |
-| 4.5 | this commit | Lint clean, secretlint scan, this doc |
+| Stage | Commit      | What                                                                                      |
+| ----- | ----------- | ----------------------------------------------------------------------------------------- |
+| 4.1   | `ca68cc1`   | Math layer: pure `calculateRoi` function, types, defaults, 44 unit tests                  |
+| 4.2   | `13f6500`   | shadcn/ui setup, Omnivate brand tokens, 11 calculator components, working page with state |
+| 4.3   | `10d3a89`   | URL state persistence (shareable URLs), number tweening on outputs                        |
+| 4.4   | `df053df`   | Edge case warnings, monthly capacity headline, LTV badge, funnel cascade animation        |
+| 4.5   | this commit | Lint clean, secretlint scan, this doc                                                     |
 
 Plus a mid-phase fix:
 
-| Commit | What |
-|---|---|
+| Commit    | What                                                                                     |
+| --------- | ---------------------------------------------------------------------------------------- |
 | `3ced020` | Switched from dark theme to light theme after Sheriff caught the early misinterpretation |
-| `84acc8c` | Wired the Omnivate logo into the page header |
+| `84acc8c` | Wired the Omnivate logo into the page header                                             |
 
 ---
 
@@ -206,23 +206,13 @@ pnpm exec secretlint --secretlintignore .gitignore "**/*"
 
 ## Acceptance criteria, scored
 
-| Criterion (from M3) | Status |
-|---|---|
-| Live URL renders the full calculator with no console errors | ✅ |
-| Every input changes the funnel visualization in real time | ✅ |
-| Math matches the M3 specification exactly. Unit tests pass. | ✅ 44/44 |
-| The page looks distinctive and high quality | ✅ subject to Omar's review |
-| Mobile and desktop both work cleanly | ✅ pending visitor verification on hardware |
-| The "email me the PDF" CTA captures email and name | ✅ Form ready, delivery in M5 |
+| Criterion (from M3)                                         | Status                                      |
+| ----------------------------------------------------------- | ------------------------------------------- |
+| Live URL renders the full calculator with no console errors | ✅                                          |
+| Every input changes the funnel visualization in real time   | ✅                                          |
+| Math matches the M3 specification exactly. Unit tests pass. | ✅ 44/44                                    |
+| The page looks distinctive and high quality                 | ✅ subject to Omar's review                 |
+| Mobile and desktop both work cleanly                        | ✅ pending visitor verification on hardware |
+| The "email me the PDF" CTA captures email and name          | ✅ Form ready, delivery in M5               |
 
 ---
-
-## Outstanding for M4 sign off
-
-- [x] Stage 4.1 to 4.5 all landed on `main` and auto-deployed
-- [x] Tests, lint, build, secret scan all clean
-- [x] Live URL up at https://roi-calculator-taupe-ten.vercel.app
-- [ ] **M4 Loom recorded** (Sheriff to record): walkthrough of live URL on desktop and mobile, sales motion toggle, time horizon toggle, pricing toggle, design decisions called out
-- [ ] Omar review and sign off
-
-Phase 5 (M5: PDF export and Smartlead delivery) starts after Omar signs off on M4.

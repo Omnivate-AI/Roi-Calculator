@@ -10,6 +10,7 @@ Last updated: 2026-05-06
 Four realistic scenarios with hand-verifiable outputs. Use these to confirm the calculator's math is correct, to demo the calculator on the M4 Loom, and as a regression baseline. The numbers in this document are asserted in `tests/scenarios.test.ts` so they cannot drift from what the calculator actually produces.
 
 Each scenario provides:
+
 - A plain-language description of the company being modeled
 - The exact input values to plug in
 - A shareable URL that loads the scenario into the calculator with one click
@@ -24,48 +25,49 @@ A typical Omnivate client. 30 mailboxes spread across 10 domains, sending around
 
 **Inputs (this is the calculator's first-paint state, just open the live URL):**
 
-| Field | Value |
-|---|---|
-| Sales motion | Sales-led |
-| Domains | 10 |
-| Mailboxes per domain | 3 |
-| Emails per mailbox per day | 30 |
-| Working days per month | 22 |
-| Sequence steps | 4 |
-| Open rate | 55% |
-| Reply rate | 5% |
-| Positive reply rate | 30% |
-| Meeting booking rate | 70% |
-| Close rate | 18% |
-| Deal value | $25,000 |
-| Hidden conversion rate | 0.3% |
-| Halo uplift | 8% |
-| Omnivate fee | $4,000/mo |
+| Field                      | Value     |
+| -------------------------- | --------- |
+| Sales motion               | Sales-led |
+| Domains                    | 10        |
+| Mailboxes per domain       | 3         |
+| Emails per mailbox per day | 30        |
+| Working days per month     | 22        |
+| Sequence steps             | 4         |
+| Open rate                  | 55%       |
+| Reply rate                 | 5%        |
+| Positive reply rate        | 30%       |
+| Meeting booking rate       | 70%       |
+| Close rate                 | 18%       |
+| Deal value                 | $25,000   |
+| Hidden conversion rate     | 0.3%      |
+| Halo uplift                | 8%        |
+| Omnivate fee               | $4,000/mo |
 
 **URL:** [https://roi-calculator-taupe-ten.vercel.app](https://roi-calculator-taupe-ten.vercel.app)
 
 **Expected outputs:**
 
-| Funnel stage | Value |
-|---|---|
+| Funnel stage     | Value         |
+| ---------------- | ------------- |
 | Monthly capacity | 19,800 emails |
-| Contacts reached | 4,950 |
-| Opens | 2,723 |
-| Replies | 248 |
-| Positive replies | 74 |
-| Meetings | 52 |
-| Deals | 9 |
+| Contacts reached | 4,950         |
+| Opens            | 2,723         |
+| Replies          | 248           |
+| Positive replies | 74            |
+| Meetings         | 52            |
+| Deals            | 9             |
 
-| Revenue line | Annual value |
-|---|---|
-| Direct outbound | $2,806,650 |
-| Hidden pipeline | $2,227,500 |
-| Halo bonus | $402,732 |
+| Revenue line      | Annual value   |
+| ----------------- | -------------- |
+| Direct outbound   | $2,806,650     |
+| Hidden pipeline   | $2,227,500     |
+| Halo bonus        | $402,732       |
 | **Total revenue** | **$5,436,882** |
-| Omnivate cost | $48,000 |
-| **ROI multiple** | **113×** |
+| Omnivate cost     | $48,000        |
+| **ROI multiple**  | **113×**       |
 
 **Math walk through:**
+
 - Capacity: 10 × 3 × 30 × 22 = 19,800
 - Contacts: 19,800 ÷ 4 = 4,950
 - Opens: 4,950 × 0.55 = 2,722.5
@@ -90,45 +92,46 @@ A more cautious projection. Smaller infrastructure (8 domains), modest reply rat
 
 **Inputs (deltas from defaults in bold):**
 
-| Field | Value |
-|---|---|
-| Sales motion | Sales-led |
-| **Domains** | **8** |
-| Mailboxes per domain | 3 |
-| Emails per mailbox per day | 30 |
-| Working days per month | 22 |
-| Sequence steps | 4 |
-| Open rate | 55% |
-| **Reply rate** | **3%** |
-| Positive reply rate | 30% |
-| Meeting booking rate | 70% |
-| Close rate | 18% |
-| **Deal value** | **$20,000** |
+| Field                      | Value       |
+| -------------------------- | ----------- |
+| Sales motion               | Sales-led   |
+| **Domains**                | **8**       |
+| Mailboxes per domain       | 3           |
+| Emails per mailbox per day | 30          |
+| Working days per month     | 22          |
+| Sequence steps             | 4           |
+| Open rate                  | 55%         |
+| **Reply rate**             | **3%**      |
+| Positive reply rate        | 30%         |
+| Meeting booking rate       | 70%         |
+| Close rate                 | 18%         |
+| **Deal value**             | **$20,000** |
 
 **URL:** [https://roi-calculator-taupe-ten.vercel.app/?domains=8&replyRate=3&dealValue=20000](https://roi-calculator-taupe-ten.vercel.app/?domains=8&replyRate=3&dealValue=20000)
 
 **Expected outputs:**
 
-| Funnel stage | Value |
-|---|---|
+| Funnel stage     | Value         |
+| ---------------- | ------------- |
 | Monthly capacity | 15,840 emails |
-| Contacts reached | 3,960 |
-| Opens | 2,178 |
-| Replies | 119 |
-| Positive replies | 36 |
-| Meetings | 25 |
-| Deals | 4 |
+| Contacts reached | 3,960         |
+| Opens            | 2,178         |
+| Replies          | 119           |
+| Positive replies | 36            |
+| Meetings         | 25            |
+| Deals            | 4             |
 
-| Revenue line | Annual value |
-|---|---|
-| Direct outbound | $1,077,754 |
-| Hidden pipeline | $1,482,624 |
-| Halo bonus | $204,830 |
+| Revenue line      | Annual value   |
+| ----------------- | -------------- |
+| Direct outbound   | $1,077,754     |
+| Hidden pipeline   | $1,482,624     |
+| Halo bonus        | $204,830       |
 | **Total revenue** | **$2,765,208** |
-| Omnivate cost | $48,000 |
-| **ROI multiple** | **58×** |
+| Omnivate cost     | $48,000        |
+| **ROI multiple**  | **58×**        |
 
 **Math walk through:**
+
 - Capacity: 8 × 3 × 30 × 22 = 15,840
 - Contacts: 15,840 ÷ 4 = 3,960
 - Opens: 3,960 × 0.55 = 2,178
@@ -152,45 +155,46 @@ A well-resourced enterprise outbound program with strong execution. 60 mailboxes
 
 **Inputs (deltas from defaults in bold):**
 
-| Field | Value |
-|---|---|
-| Sales motion | Sales-led |
-| **Domains** | **20** |
-| Mailboxes per domain | 3 |
-| Emails per mailbox per day | 30 |
-| Working days per month | 22 |
-| Sequence steps | 4 |
-| **Open rate** | **60%** |
-| **Reply rate** | **6%** |
-| **Positive reply rate** | **35%** |
-| **Meeting booking rate** | **75%** |
-| **Close rate** | **22%** |
-| **Deal value** | **$50,000** |
+| Field                      | Value       |
+| -------------------------- | ----------- |
+| Sales motion               | Sales-led   |
+| **Domains**                | **20**      |
+| Mailboxes per domain       | 3           |
+| Emails per mailbox per day | 30          |
+| Working days per month     | 22          |
+| Sequence steps             | 4           |
+| **Open rate**              | **60%**     |
+| **Reply rate**             | **6%**      |
+| **Positive reply rate**    | **35%**     |
+| **Meeting booking rate**   | **75%**     |
+| **Close rate**             | **22%**     |
+| **Deal value**             | **$50,000** |
 
 **URL:** [https://roi-calculator-taupe-ten.vercel.app/?domains=20&openRate=60&replyRate=6&positiveReplyRate=35&meetingBookingRate=75&closeRate=22&dealValue=50000](https://roi-calculator-taupe-ten.vercel.app/?domains=20&openRate=60&replyRate=6&positiveReplyRate=35&meetingBookingRate=75&closeRate=22&dealValue=50000)
 
 **Expected outputs:**
 
-| Funnel stage | Value |
-|---|---|
+| Funnel stage     | Value         |
+| ---------------- | ------------- |
 | Monthly capacity | 39,600 emails |
-| Contacts reached | 9,900 |
-| Opens | 5,940 |
-| Replies | 594 |
-| Positive replies | 208 |
-| Meetings | 156 |
-| Deals | 34 |
+| Contacts reached | 9,900         |
+| Opens            | 5,940         |
+| Replies          | 594           |
+| Positive replies | 208           |
+| Meetings         | 156           |
+| Deals            | 34            |
 
-| Revenue line | Annual value |
-|---|---|
-| Direct outbound | $20,582,100 |
-| Hidden pipeline | $9,622,800 |
-| Halo bonus | $2,416,392 |
+| Revenue line      | Annual value    |
+| ----------------- | --------------- |
+| Direct outbound   | $20,582,100     |
+| Hidden pipeline   | $9,622,800      |
+| Halo bonus        | $2,416,392      |
 | **Total revenue** | **$32,621,292** |
-| Omnivate cost | $48,000 |
-| **ROI multiple** | **680×** |
+| Omnivate cost     | $48,000         |
+| **ROI multiple**  | **680×**        |
 
 **Math walk through:**
+
 - Capacity: 20 × 3 × 30 × 22 = 39,600
 - Contacts: 39,600 ÷ 4 = 9,900
 - Opens: 9,900 × 0.60 = 5,940
@@ -216,52 +220,53 @@ This scenario also exercises the subscription branch of the math: average lifeti
 
 **Inputs (deltas from defaults in bold):**
 
-| Field | Value |
-|---|---|
-| **Sales motion** | **Self-service SaaS** |
-| **Domains** | **5** |
-| **Mailboxes per domain** | **2** |
-| Emails per mailbox per day | 30 |
-| Working days per month | 22 |
-| **Sequence steps** | **3** |
-| **Open rate** | **50%** |
-| **Reply rate** | **4%** |
-| **Positive reply rate** | **25%** |
-| **Meeting booking rate** | **60%** |
-| Close rate | 30% (self-service default) |
-| **Monthly subscription value** | **$300** |
-| **Monthly churn rate** | **6%** |
+| Field                          | Value                      |
+| ------------------------------ | -------------------------- |
+| **Sales motion**               | **Self-service SaaS**      |
+| **Domains**                    | **5**                      |
+| **Mailboxes per domain**       | **2**                      |
+| Emails per mailbox per day     | 30                         |
+| Working days per month         | 22                         |
+| **Sequence steps**             | **3**                      |
+| **Open rate**                  | **50%**                    |
+| **Reply rate**                 | **4%**                     |
+| **Positive reply rate**        | **25%**                    |
+| **Meeting booking rate**       | **60%**                    |
+| Close rate                     | 30% (self-service default) |
+| **Monthly subscription value** | **$300**                   |
+| **Monthly churn rate**         | **6%**                     |
 
 **URL:** [https://roi-calculator-taupe-ten.vercel.app/?salesMotion=self_service&domains=5&mailboxesPerDomain=2&sequenceSteps=3&openRate=50&replyRate=4&positiveReplyRate=25&meetingBookingRate=60&closeRate=30&dealType=subscription&monthlySubscriptionValue=300&monthlyChurnRate=6](https://roi-calculator-taupe-ten.vercel.app/?salesMotion=self_service&domains=5&mailboxesPerDomain=2&sequenceSteps=3&openRate=50&replyRate=4&positiveReplyRate=25&meetingBookingRate=60&closeRate=30&dealType=subscription&monthlySubscriptionValue=300&monthlyChurnRate=6)
 
 **Expected outputs:**
 
-| Funnel stage | Value |
-|---|---|
+| Funnel stage     | Value        |
+| ---------------- | ------------ |
 | Monthly capacity | 6,600 emails |
-| Contacts reached | 2,200 |
-| Opens | 1,100 |
-| Replies | 88 |
-| Positive replies | 22 |
-| Meetings | 13 |
-| Deals | 4 |
+| Contacts reached | 2,200        |
+| Opens            | 1,100        |
+| Replies          | 88           |
+| Positive replies | 22           |
+| Meetings         | 13           |
+| Deals            | 4            |
 
-| Subscription detail | Value |
-|---|---|
+| Subscription detail       | Value       |
+| ------------------------- | ----------- |
 | Average customer lifetime | 16.7 months |
-| Customer LTV | $5,000 |
-| MRR added (annualised) | $14,256 |
+| Customer LTV              | $5,000      |
+| MRR added (annualised)    | $14,256     |
 
-| Revenue line | Annual value |
-|---|---|
-| Direct outbound (cohort LTV) | $237,600 |
-| Hidden pipeline | $182,160 |
-| Halo bonus | $33,581 |
-| **Total revenue** | **$453,341** |
-| Omnivate cost | $48,000 |
-| **ROI multiple** | **9.4×** |
+| Revenue line                 | Annual value |
+| ---------------------------- | ------------ |
+| Direct outbound (cohort LTV) | $237,600     |
+| Hidden pipeline              | $182,160     |
+| Halo bonus                   | $33,581      |
+| **Total revenue**            | **$453,341** |
+| Omnivate cost                | $48,000      |
+| **ROI multiple**             | **9.4×**     |
 
 **Math walk through:**
+
 - Capacity: 5 × 2 × 30 × 22 = 6,600
 - Contacts: 6,600 ÷ 3 = 2,200
 - Opens: 2,200 × 0.50 = 1,100
@@ -281,30 +286,6 @@ This scenario also exercises the subscription branch of the math: average lifeti
 - ROI: 453,341 ÷ 48,000 = 9.44
 
 A quick word on what "Direct outbound" means for subscription: this is the **lifetime value of all customers acquired in 12 months**. It is not the cash collected in year 1 (that would be much smaller, closer to MRR added). The calculator deliberately leads with cohort LTV because that is the real economic outcome of the program; what year 1 cash looks like depends entirely on payment timing.
-
----
-
-## How to use this for the M4 Loom
-
-Suggested 5 minute walkthrough:
-
-**0:00 to 0:30. Open Scenario A.**
-"This is the M1 default, the calculator's first-paint state. A typical Omnivate client running 30 mailboxes across 10 domains sending 19,800 cold emails per month. The math says about 113× ROI on the $4k monthly fee."
-
-**0:30 to 1:30. Scrub the controls.**
-Show the funnel responding live. Drag the close rate slider down to zero, point out the warning. Drag it back up. Toggle time horizon between 6, 12, and 24 months and show totals scale. Move pricing slider; show ROI multiple change.
-
-**1:30 to 2:30. Open Scenario C in a new tab.**
-"Here's what an aggressive enterprise program looks like. Higher open rate, higher reply, larger deals. The total revenue is over $32M and ROI multiple is around 680×. The point is not the headline number, it is that this calculator is honest about how the inputs cascade."
-
-**2:30 to 3:30. Open Scenario D.**
-"Now a self-service SaaS with subscription pricing. Toggle to self-service. Notice the LTV badge appears under the churn slider. With 6% monthly churn, average lifetime is 16.7 months, so LTV is $5,000. Total revenue is ~$453k from outbound; the math respects that recurring revenue plays out over time, not all at once."
-
-**3:30 to 4:30. Show URL state and copy paste.**
-Tweak some inputs in Scenario D. Highlight the URL bar — show the params updating. Open a new tab, paste the URL, show the same calculation loads. "Anyone in your sales meetings can paste this URL and see the exact same projection."
-
-**4:30 to 5:00. Mobile + close.**
-Open browser dev tools, switch to mobile (375px). Show the layout stacks cleanly. Close: "M4 is complete. M5 is next, which adds the actual PDF generation and Smartlead delivery to the form. Ready for sign off."
 
 ---
 
