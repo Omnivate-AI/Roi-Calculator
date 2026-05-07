@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { formatInteger, formatPercent } from "@/lib/utils";
 
 interface FunnelStage {
@@ -32,18 +29,12 @@ interface FunnelVizProps {
 /**
  * Vertical bar funnel showing every stage with bar width proportional to volume
  * relative to the top stage. Conversion percentages between stages, in mono.
- * On first paint, stages cascade in with a 60ms stagger per the M3 motion
- * language. Subsequent updates use the existing CSS width transition.
+ *
+ * On first paint, stages cascade in with a 60ms stagger via CSS animation
+ * (no React state, so the animation only plays on mount; subsequent input
+ * changes tween the bar width via the existing CSS transition).
  */
 export function FunnelViz(props: FunnelVizProps) {
-  // hasMounted flips after the first render so we can apply a one-shot cascade
-  // animation on initial paint, then let the bars tween in place via CSS
-  // transitions for any further input changes.
-  const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
   const stages: FunnelStage[] = [
     { label: "Contacts reached", value: props.contactsReached },
     {
@@ -100,17 +91,16 @@ export function FunnelViz(props: FunnelVizProps) {
       <div className="space-y-3">
         {stages.map((stage, index) => {
           const widthPercent = Math.max(2, (stage.value / maxValue) * 100);
-          const cascadeStyle = hasMounted
-            ? undefined
-            : ({
-                opacity: 0,
-                animation: `funnel-cascade 400ms cubic-bezier(0.16, 1, 0.3, 1) ${
-                  index * 60
-                }ms forwards`,
-              } as React.CSSProperties);
-
           return (
-            <div key={stage.label} className="space-y-1.5" style={cascadeStyle}>
+            <div
+              key={stage.label}
+              className="funnel-stage space-y-1.5"
+              style={
+                {
+                  "--cascade-delay": `${index * 60}ms`,
+                } as React.CSSProperties
+              }
+            >
               {stage.conversionFromPrevious && (
                 <div className="flex items-center gap-2 pl-1 text-xs text-muted-foreground">
                   <span className="font-mono tabular-nums">
@@ -145,11 +135,22 @@ export function FunnelViz(props: FunnelVizProps) {
         })}
       </div>
 
-      {/* Cascade keyframes scoped to this component. */}
+      {/* One-shot cascade animation on mount; runs once because CSS animations
+          only fire on initial paint when the element is added to the DOM. */}
       <style>{`
+        .funnel-stage {
+          opacity: 0;
+          animation: funnel-cascade 400ms cubic-bezier(0.16, 1, 0.3, 1) var(--cascade-delay) forwards;
+        }
         @keyframes funnel-cascade {
           from { opacity: 0; transform: translateX(-12px); }
-          to { opacity: 1; transform: translateX(0); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .funnel-stage {
+            opacity: 1;
+            animation: none;
+          }
         }
       `}</style>
     </div>

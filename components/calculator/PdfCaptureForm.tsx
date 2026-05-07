@@ -30,10 +30,9 @@ export function PdfCaptureForm({ onSubmit }: PdfCaptureFormProps) {
       if (onSubmit) {
         await onSubmit({ email, name, companyName });
       } else {
-        // Stage 4.2 placeholder: just log and pretend success after a moment.
+        // Stage 4.2 placeholder: pretend success after a moment. M5 wires
+        // the real Smartlead delivery; until then this is a no-op preview.
         await new Promise((resolve) => setTimeout(resolve, 600));
-        // eslint-disable-next-line no-console
-        console.log("[PdfCaptureForm] would submit", { email, name, companyName });
       }
       setStatus("success");
     } catch {

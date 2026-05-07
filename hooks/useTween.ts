@@ -10,7 +10,9 @@ import { useEffect, useRef, useState } from "react";
  * Default duration 300ms (within the 250 to 400 millisecond range specified
  * in M3). Pass a different duration for shorter or longer eases.
  *
- * Cancels in flight tweens when the target changes mid animation.
+ * Cancels in flight tweens when the target changes mid animation. Respects
+ * prefers-reduced-motion by skipping the easing curve and snapping to the
+ * target value on the next frame.
  */
 export function useTween(target: number, duration = 300): number {
   const [value, setValue] = useState(target);
@@ -25,22 +27,26 @@ export function useTween(target: number, duration = 300): number {
 
     const from = valueRef.current;
     const distance = target - from;
+    if (distance === 0) return;
 
-    if (distance === 0) {
-      return;
-    }
-
-    // Skip animation for tiny changes (less than half a unit on whole numbers)
-    // or for the first paint when reduced motion is preferred. The browser
-    // will still respect prefers-reduced-motion via the global CSS rule, but
-    // this is a defense in depth.
-    if (
+    const reducedMotion =
       typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-    ) {
-      valueRef.current = target;
-      setValue(target);
-      return;
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    if (reducedMotion) {
+      // Snap on next frame rather than synchronously to keep React's
+      // effect/commit semantics happy; the visitor sees an instant update.
+      rafRef.current = requestAnimationFrame(() => {
+        valueRef.current = target;
+        setValue(target);
+        rafRef.current = null;
+      });
+      return () => {
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+      };
     }
 
     const start = performance.now();

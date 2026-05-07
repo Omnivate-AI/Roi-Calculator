@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { calculateRoi } from "@/lib/calculations";
 import { DEFAULT_INPUTS, getDefaultsForMotion } from "@/lib/defaults";
@@ -20,12 +21,15 @@ export default function Home() {
 
   // On first mount, hydrate inputs from URL search params if any. Server side
   // render uses defaults; this effect runs only on the client and replaces
-  // state if the visitor landed on a shared URL.
+  // state if the visitor landed on a shared URL. The setState here is
+  // intentional one-time hydration on mount, which the new react-hooks rule
+  // flags as a generic anti-pattern; it is legitimate here.
   useEffect(() => {
     if (hasHydratedRef.current) return;
     hasHydratedRef.current = true;
     const fromUrl = readInputsFromUrl();
     if (fromUrl !== DEFAULT_INPUTS) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputs(fromUrl);
     }
   }, []);
@@ -80,7 +84,7 @@ export default function Home() {
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16 md:py-20 space-y-20 sm:space-y-24">
         {/* Header */}
         <header className="flex items-center justify-between">
-          <a
+          <Link
             href="/"
             aria-label="Omnivate ROI Calculator home"
             className="inline-flex items-center transition-opacity hover:opacity-80"
@@ -93,7 +97,7 @@ export default function Home() {
               priority
               className="h-8 w-auto sm:h-9"
             />
-          </a>
+          </Link>
           <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             ROI Calculator
           </span>

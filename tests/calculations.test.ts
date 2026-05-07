@@ -8,7 +8,6 @@ import { calculateRoi } from "@/lib/calculations";
 import {
   DEFAULT_INPUTS,
   LIFETIME_CAP_MONTHS,
-  SENSITIVITY_VARIANCE,
   getDefaultsForMotion,
 } from "@/lib/defaults";
 import type { CalculatorInputs } from "@/lib/types";
