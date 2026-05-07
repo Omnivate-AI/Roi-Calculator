@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { calculateRoi } from "@/lib/calculations";
 import { DEFAULT_INPUTS, getDefaultsForMotion } from "@/lib/defaults";
@@ -57,12 +58,20 @@ export default function Home() {
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16 md:py-20 space-y-20 sm:space-y-24">
         {/* Header */}
         <header className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-2 w-2 rounded-full bg-brand-electric" />
-            <span className="text-sm font-medium tracking-tight text-foreground/80">
-              Omnivate
-            </span>
-          </div>
+          <a
+            href="/"
+            aria-label="Omnivate ROI Calculator home"
+            className="inline-flex items-center transition-opacity hover:opacity-80"
+          >
+            <Image
+              src="/omnivate-logo.png"
+              alt="Omnivate"
+              width={1400}
+              height={300}
+              priority
+              className="h-8 w-auto sm:h-9"
+            />
+          </a>
           <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             ROI Calculator
           </span>
