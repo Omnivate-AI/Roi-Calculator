@@ -1,4 +1,5 @@
 import { formatCurrency, formatInteger } from "@/lib/utils";
+import { TweenedNumber } from "./TweenedNumber";
 
 interface RoiSummaryProps {
   directRevenue: number;
@@ -15,7 +16,8 @@ interface RoiSummaryProps {
 
 /**
  * Three column summary: direct outbound, hidden pipeline, halo bonus.
- * Plus the headline total with sensitivity band.
+ * Plus the headline total with sensitivity band. Every visible number tweens
+ * when inputs change.
  */
 export function RoiSummary({
   directRevenue,
@@ -46,12 +48,20 @@ export function RoiSummary({
         <SummaryCard
           eyebrow="Direct outbound"
           value={directRevenue * horizonFactor}
-          subtitle={`${formatInteger(dealsPerMonth)} deals per month`}
+          subtitle={
+            <>
+              <TweenedNumber value={dealsPerMonth} format={formatInteger} /> deals per month
+            </>
+          }
         />
         <SummaryCard
           eyebrow="Hidden pipeline"
           value={hiddenRevenue * horizonFactor}
-          subtitle={`${formatInteger(hiddenDealsPerMonth)} deals per month from engaged silent contacts`}
+          subtitle={
+            <>
+              <TweenedNumber value={hiddenDealsPerMonth} format={formatInteger} /> deals per month from engaged silent contacts
+            </>
+          }
         />
         <SummaryCard
           eyebrow="Halo bonus"
@@ -66,16 +76,25 @@ export function RoiSummary({
             Total projected revenue
           </p>
           <p className="font-mono text-4xl font-semibold tabular-nums text-foreground sm:text-5xl">
-            {formatCurrency(totalRevenue * horizonFactor)}
+            <TweenedNumber
+              value={totalRevenue * horizonFactor}
+              format={(n) => formatCurrency(n)}
+            />
           </p>
           <p className="text-sm text-muted-foreground">
             Sensitivity band:{" "}
             <span className="font-mono tabular-nums text-foreground/80">
-              {formatCurrency(totalRevenueLow * horizonFactor, { compact: true })}
+              <TweenedNumber
+                value={totalRevenueLow * horizonFactor}
+                format={(n) => formatCurrency(n, { compact: true })}
+              />
             </span>{" "}
             to{" "}
             <span className="font-mono tabular-nums text-foreground/80">
-              {formatCurrency(totalRevenueHigh * horizonFactor, { compact: true })}
+              <TweenedNumber
+                value={totalRevenueHigh * horizonFactor}
+                format={(n) => formatCurrency(n, { compact: true })}
+              />
             </span>
           </p>
         </div>
@@ -87,7 +106,7 @@ export function RoiSummary({
 interface SummaryCardProps {
   eyebrow: string;
   value: number;
-  subtitle: string;
+  subtitle: React.ReactNode;
 }
 
 function SummaryCard({ eyebrow, value, subtitle }: SummaryCardProps) {
@@ -97,7 +116,7 @@ function SummaryCard({ eyebrow, value, subtitle }: SummaryCardProps) {
         {eyebrow}
       </p>
       <p className="mt-3 font-mono text-2xl font-semibold tabular-nums text-foreground sm:text-3xl">
-        {formatCurrency(value)}
+        <TweenedNumber value={value} format={(n) => formatCurrency(n)} />
       </p>
       <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{subtitle}</p>
     </div>

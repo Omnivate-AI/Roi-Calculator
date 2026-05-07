@@ -1,4 +1,5 @@
 import { formatCurrency, formatMultiple } from "@/lib/utils";
+import { TweenedNumber } from "./TweenedNumber";
 
 interface ComparisonViewProps {
   totalRevenue: number;
@@ -64,12 +65,37 @@ export function ComparisonView({
               className="font-mono text-3xl font-semibold tabular-nums sm:text-4xl"
               style={{ color: "hsl(var(--brand-sunset))" }}
             >
-              {formatCurrency(totalRevenue * horizonFactor)}
+              <TweenedNumber
+                value={totalRevenue * horizonFactor}
+                format={(n) => formatCurrency(n)}
+              />
             </p>
             <div className="space-y-1 pt-3 text-sm">
-              <Row label="Cost" value={formatCurrency(totalCost * horizonFactor)} muted />
-              <Row label="Net" value={formatCurrency(roiNet * horizonFactor)} muted />
-              <Row label="ROI" value={formatMultiple(roiMultiple)} highlight />
+              <Row
+                label="Cost"
+                value={
+                  <TweenedNumber
+                    value={totalCost * horizonFactor}
+                    format={(n) => formatCurrency(n)}
+                  />
+                }
+                muted
+              />
+              <Row
+                label="Net"
+                value={
+                  <TweenedNumber
+                    value={roiNet * horizonFactor}
+                    format={(n) => formatCurrency(n)}
+                  />
+                }
+                muted
+              />
+              <Row
+                label="ROI"
+                value={<TweenedNumber value={roiMultiple} format={formatMultiple} />}
+                highlight
+              />
             </div>
           </div>
         </div>
@@ -80,7 +106,7 @@ export function ComparisonView({
 
 interface RowProps {
   label: string;
-  value: string;
+  value: React.ReactNode;
   muted?: boolean;
   highlight?: boolean;
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { calculateRoi } from "@/lib/calculations";
 import { DEFAULT_INPUTS, getDefaultsForMotion } from "@/lib/defaults";
 import type { CalculatorInputs, SalesMotion, TimeHorizon } from "@/lib/types";
+import { readInputsFromUrl, writeInputsToUrl } from "@/lib/url-state";
 import { ControlsPanel } from "@/components/calculator/ControlsPanel";
 import { FunnelViz } from "@/components/calculator/FunnelViz";
 import { HeroNumber } from "@/components/calculator/HeroNumber";
@@ -15,6 +16,27 @@ import { TimeHorizonToggle } from "@/components/calculator/TimeHorizonToggle";
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
+  const hasHydratedRef = useRef(false);
+
+  // On first mount, hydrate inputs from URL search params if any. Server side
+  // render uses defaults; this effect runs only on the client and replaces
+  // state if the visitor landed on a shared URL.
+  useEffect(() => {
+    if (hasHydratedRef.current) return;
+    hasHydratedRef.current = true;
+    const fromUrl = readInputsFromUrl();
+    if (fromUrl !== DEFAULT_INPUTS) {
+      setInputs(fromUrl);
+    }
+  }, []);
+
+  // Whenever inputs change, mirror them into the URL (replaceState, not push,
+  // so the back button is not cluttered). Skipped until after hydration so
+  // we do not overwrite shared URLs with defaults on first render.
+  useEffect(() => {
+    if (!hasHydratedRef.current) return;
+    writeInputsToUrl(inputs);
+  }, [inputs]);
 
   const outputs = useMemo(() => calculateRoi(inputs), [inputs]);
 

@@ -1,4 +1,5 @@
 import { formatCurrency, formatMultiple } from "@/lib/utils";
+import { TweenedNumber } from "./TweenedNumber";
 
 interface HeroNumberProps {
   roiMultiple: number;
@@ -9,9 +10,9 @@ interface HeroNumberProps {
 }
 
 /**
- * The biggest number on the page. Massive ROI multiple in brand-electric, with
- * the sensitivity band beneath in muted text. This is the headline visitors
- * remember and screenshot.
+ * The biggest number on the page. Massive ROI multiple with the brand gradient
+ * and a soft drop shadow, sensitivity band beneath in muted text. Both the
+ * headline and the band tween smoothly when inputs change.
  */
 export function HeroNumber({
   roiMultiple,
@@ -21,6 +22,7 @@ export function HeroNumber({
   companyName,
 }: HeroNumberProps) {
   const personalised = companyName?.trim() ? ` for ${companyName}` : "";
+  const horizonFactor = timeHorizonMonths / 12;
 
   return (
     <div className="space-y-6 text-center sm:text-left">
@@ -43,7 +45,7 @@ export function HeroNumber({
             filter: "drop-shadow(0 4px 16px hsl(var(--brand-primary) / 0.18))",
           }}
         >
-          {formatMultiple(roiMultiple)}
+          <TweenedNumber value={roiMultiple} format={formatMultiple} />
         </span>
         <span className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
           Return on investment
@@ -53,11 +55,17 @@ export function HeroNumber({
       <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
         Between{" "}
         <span className="font-mono tabular-nums text-foreground">
-          {formatCurrency(totalRevenueLow, { compact: true })}
+          <TweenedNumber
+            value={totalRevenueLow * horizonFactor}
+            format={(n) => formatCurrency(n, { compact: true })}
+          />
         </span>{" "}
         and{" "}
         <span className="font-mono tabular-nums text-foreground">
-          {formatCurrency(totalRevenueHigh, { compact: true })}
+          <TweenedNumber
+            value={totalRevenueHigh * horizonFactor}
+            format={(n) => formatCurrency(n, { compact: true })}
+          />
         </span>{" "}
         over {timeHorizonMonths} months
       </p>
