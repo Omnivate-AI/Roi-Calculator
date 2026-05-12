@@ -1,87 +1,156 @@
-// Default values for the calculator.
-// Source: docs/m3-requirements-stack.md, sections "Visitor inputs" and
-// "Sales motion presets". Anything that ships in the UI as a default value
-// lives here and only here.
+// Default values, constants, and benchmark thresholds for the calculator
+// (V2 simplified). Everything that ships in the UI as a default value or
+// gets used to label slider positions lives here and only here.
 
-import type { CalculatorInputs, SalesMotion } from "./types";
-
-/**
- * Defaults that change when the visitor toggles between sales motions.
- */
-export const SALES_LED_DEFAULTS = {
-  closeRate: 18,
-  dealType: "one_time" as const,
-  dealValue: 25_000,
-  monthlySubscriptionValue: 200, // not used when dealType is one_time, but present for consistency
-  monthlyChurnRate: 2,
-};
-
-export const SELF_SERVICE_DEFAULTS = {
-  closeRate: 30,
-  dealType: "subscription" as const,
-  dealValue: 25_000, // not used when dealType is subscription, but present for consistency
-  monthlySubscriptionValue: 200,
-  monthlyChurnRate: 5,
-};
+import type {
+  BenchmarkStatus,
+  CalculatorInputs,
+  SequenceSteps,
+} from "./types";
 
 /**
- * Defaults that do not change between sales motions.
+ * Total monthly cold email sending capacity. Fixed in V2; the calculator no
+ * longer asks the visitor to model the underlying infrastructure (domains,
+ * mailboxes, send limits). 24,000 emails per month represents a
+ * conventional Omnivate setup.
  */
-export const SHARED_DEFAULTS = {
-  // Volume (Layer 1)
-  domains: 10,
-  mailboxesPerDomain: 3,
-  emailsPerMailboxPerDay: 30,
-  workingDaysPerMonth: 22,
+export const MONTHLY_EMAIL_CAPACITY = 24_000;
 
-  // Sequence (Layer 2)
-  sequenceSteps: 4,
+/**
+ * Sequence steps determine the natural number of unique leads reached when
+ * the full monthly capacity is used. The visitor can then adjust the leads
+ * slider away from this default if they want to model a smaller program.
+ */
+export const LEADS_BY_SEQUENCE: Record<SequenceSteps, number> = {
+  1: 24_000,
+  2: 12_000,
+  3: 8_000,
+};
 
-  // Conversion rates (Layer 3, motion independent)
-  openRate: 55,
-  replyRate: 5,
+/**
+ * Strategy framing shown next to each sequence step option. Sequence step
+ * choice is a GTM strategy decision: broader TAM gets fewer touches per
+ * lead, narrower TAM gets more.
+ */
+export const STRATEGY_BY_SEQUENCE: Record<
+  SequenceSteps,
+  { label: string; tam: string; description: string }
+> = {
+  1: {
+    label: "1 step",
+    tam: "Large TAM",
+    description: "Maximum breadth. One shot per lead, 24,000 reached.",
+  },
+  2: {
+    label: "2 steps",
+    tam: "Moderate TAM",
+    description: "Balanced. Two touches per lead, 12,000 reached.",
+  },
+  3: {
+    label: "3 steps",
+    tam: "Small TAM",
+    description: "Maximum depth. Three touches per lead, 8,000 reached.",
+  },
+};
+
+/**
+ * Slider range caps. Reply rate is purposefully capped at 5 because anything
+ * higher is unrealistic for cold email and visitors entering 30% would
+ * produce nonsense projections.
+ */
+export const SLIDER_LIMITS = {
+  leadsReached: { min: 0, max: 30_000, step: 100 },
+  openRate: { min: 0, max: 100, step: 1 },
+  replyRate: { min: 0, max: 5, step: 0.1 },
+  positiveReplyRate: { min: 0, max: 100, step: 1 },
+  meetingBookedRate: { min: 0, max: 100, step: 1 },
+  closeRate: { min: 0, max: 100, step: 1 },
+  dealValue: { min: 100, max: 1_000_000, step: 500 },
+} as const;
+
+/**
+ * Benchmark thresholds for the dynamic status labels under each slider.
+ * Each entry lists the lower bound at which a status begins. The status for
+ * a value is the highest entry whose threshold the value meets or exceeds.
+ *
+ * Tick markers on the slider tracks line up with the threshold values.
+ */
+export const BENCHMARK_THRESHOLDS: Record<
+  keyof typeof SLIDER_LIMITS,
+  { status: BenchmarkStatus; threshold: number; tick?: string }[]
+> = {
+  leadsReached: [
+    { status: "poor", threshold: 0 },
+    { status: "average", threshold: 4_000 },
+    { status: "healthy", threshold: 12_000 },
+    { status: "benchmark", threshold: 20_000 },
+  ],
+  openRate: [
+    { status: "poor", threshold: 0, tick: "Deliverability issue" },
+    { status: "average", threshold: 30, tick: "Moderate" },
+    { status: "healthy", threshold: 50, tick: "Healthy" },
+    { status: "benchmark", threshold: 75, tick: "Benchmark" },
+  ],
+  replyRate: [
+    { status: "poor", threshold: 0 },
+    { status: "average", threshold: 1.5, tick: "Average" },
+    { status: "healthy", threshold: 2.5, tick: "Healthy" },
+    { status: "benchmark", threshold: 4, tick: "Benchmark" },
+  ],
+  positiveReplyRate: [
+    { status: "poor", threshold: 0 },
+    { status: "average", threshold: 15, tick: "Average" },
+    { status: "healthy", threshold: 25, tick: "Healthy" },
+    { status: "benchmark", threshold: 35, tick: "Benchmark" },
+  ],
+  meetingBookedRate: [
+    { status: "poor", threshold: 0 },
+    { status: "average", threshold: 25, tick: "Email only" },
+    { status: "healthy", threshold: 50, tick: "Email + LinkedIn" },
+    { status: "benchmark", threshold: 75, tick: "Email + LI + calling" },
+  ],
+  closeRate: [
+    { status: "poor", threshold: 0 },
+    { status: "average", threshold: 10, tick: "Average" },
+    { status: "healthy", threshold: 18, tick: "Healthy" },
+    { status: "benchmark", threshold: 25, tick: "Benchmark" },
+  ],
+  dealValue: [
+    { status: "poor", threshold: 0 },
+    { status: "average", threshold: 1_000 },
+    { status: "healthy", threshold: 10_000 },
+    { status: "benchmark", threshold: 50_000 },
+  ],
+};
+
+/**
+ * First-paint default inputs. Values picked to land on the boundary of
+ * "healthy" for every conversion rate, giving the visitor a calibrated
+ * starting point.
+ */
+export const DEFAULT_INPUTS: CalculatorInputs = {
+  sequenceSteps: 2,
+  leadsReached: 12_000,
+  openRate: 70,
+  replyRate: 3,
   positiveReplyRate: 30,
-  meetingBookingRate: 70,
-
-  // Halo effects
-  hiddenConversionRate: 0.3,
-  haloUpliftRate: 8,
-
-  // Cost
-  omnivateMonthlyFee: 4_000,
-
-  // Display
-  timeHorizonMonths: 12 as const,
+  meetingBookedRate: 50,
+  closeRate: 20,
+  dealValue: 25_000,
 };
 
 /**
- * Hard limits.
+ * Returns the status bucket for a given input value by walking the
+ * thresholds for that field.
  */
-export const LIFETIME_CAP_MONTHS = 60;
-export const SENSITIVITY_VARIANCE = 0.1; // plus or minus 10 percent on each conversion rate
-
-/**
- * Returns the full input object for a given sales motion. Used to populate the
- * calculator on first paint and to reset motion specific defaults when the
- * visitor toggles motions.
- */
-export function getDefaultsForMotion(motion: SalesMotion): CalculatorInputs {
-  const motionDefaults =
-    motion === "sales_led" ? SALES_LED_DEFAULTS : SELF_SERVICE_DEFAULTS;
-
-  return {
-    salesMotion: motion,
-    ...SHARED_DEFAULTS,
-    ...motionDefaults,
-  };
+export function statusFor(
+  field: keyof typeof BENCHMARK_THRESHOLDS,
+  value: number
+): BenchmarkStatus {
+  const thresholds = BENCHMARK_THRESHOLDS[field];
+  let current: BenchmarkStatus = "poor";
+  for (const entry of thresholds) {
+    if (value >= entry.threshold) current = entry.status;
+  }
+  return current;
 }
-
-/**
- * The default sales motion the calculator opens with.
- */
-export const DEFAULT_SALES_MOTION: SalesMotion = "sales_led";
-
-/**
- * Convenience: full default inputs for the default motion.
- */
-export const DEFAULT_INPUTS = getDefaultsForMotion(DEFAULT_SALES_MOTION);

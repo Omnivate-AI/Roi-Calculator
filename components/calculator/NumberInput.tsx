@@ -1,7 +1,6 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { InputGroup } from "./InputGroup";
 import { cn } from "@/lib/utils";
 
 interface NumberInputProps {
@@ -16,8 +15,8 @@ interface NumberInputProps {
 }
 
 /**
- * Numeric input with optional prefix (e.g., "$") and validation.
- * Used for deal value, monthly subscription value, Omnivate fee.
+ * Numeric input with optional currency prefix and clamping. Used for deal
+ * value and any other free-form number the visitor enters.
  */
 export function NumberInput({
   label,
@@ -30,10 +29,11 @@ export function NumberInput({
   onValueChange,
 }: NumberInputProps) {
   return (
-    <InputGroup label={label} helper={helper}>
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">{label}</label>
       <div className="relative">
         {prefix && (
-          <span className="absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground pointer-events-none">
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground">
             {prefix}
           </span>
         )}
@@ -44,19 +44,18 @@ export function NumberInput({
           min={min}
           max={max}
           step={step}
-          onChange={(e) => {
-            const next = Number(e.target.value);
+          onChange={(event) => {
+            const next = Number(event.target.value);
             if (Number.isNaN(next)) return;
-            const clamped = clamp(next, min, max);
-            onValueChange(clamped);
+            onValueChange(clamp(next, min, max));
           }}
-          className={cn(
-            "font-mono tabular-nums",
-            prefix && "pl-7"
-          )}
+          className={cn("font-mono tabular-nums", prefix && "pl-7")}
         />
       </div>
-    </InputGroup>
+      {helper && (
+        <p className="text-xs leading-relaxed text-muted-foreground">{helper}</p>
+      )}
+    </div>
   );
 }
 

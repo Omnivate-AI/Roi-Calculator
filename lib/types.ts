@@ -1,97 +1,60 @@
-// Calculator type definitions.
+// Calculator type definitions (V2 simplified).
 // Source of truth for the shape of every input the visitor controls and every
-// output the calculator computes. Mirrors the variable list in
-// docs/m3-requirements-stack.md.
+// output the calculator computes. The V2 spec is captured in the
+// "V2 simplification" section of docs/m3-requirements-stack.md.
 
-export type SalesMotion = "sales_led" | "self_service";
-export type DealType = "one_time" | "subscription";
-export type TimeHorizon = 6 | 12 | 24;
+/**
+ * Sequence steps double as a GTM strategy choice. Each value implies a TAM
+ * orientation (broad TAM with one shot, narrow TAM with three touches).
+ */
+export type SequenceSteps = 1 | 2 | 3;
+
+/**
+ * Status buckets used to label slider values inline as the visitor drags.
+ * Order matters: status is computed by finding the highest threshold the
+ * value crosses.
+ */
+export type BenchmarkStatus = "poor" | "average" | "healthy" | "benchmark";
 
 /**
  * Every value the visitor can change in the calculator UI.
- * Percentages are stored as 0 to 100 (not 0 to 1) to match the slider semantics.
+ * Percentages are stored as 0 to 100 (not 0 to 1) to match the slider
+ * semantics.
  */
 export interface CalculatorInputs {
-  // Sales motion
-  salesMotion: SalesMotion;
+  // Strategy
+  sequenceSteps: SequenceSteps;
 
-  // Volume (Layer 1: sending infrastructure)
-  domains: number;
-  mailboxesPerDomain: number;
-  emailsPerMailboxPerDay: number;
-  workingDaysPerMonth: number;
+  // Volume
+  leadsReached: number; // 0 to 30,000
 
-  // Sequence (Layer 2)
-  sequenceSteps: number;
-
-  // Conversion rates (Layer 3, percentages 0 to 100)
+  // Conversion rates (percentages 0 to 100, except reply which caps at 5)
   openRate: number;
   replyRate: number;
   positiveReplyRate: number;
-  meetingBookingRate: number;
+  meetingBookedRate: number;
   closeRate: number;
 
   // Deal economics
-  dealType: DealType;
-  dealValue: number; // used when dealType === "one_time"
-  monthlySubscriptionValue: number; // used when dealType === "subscription"
-  monthlyChurnRate: number; // percent 0 to 100, used when dealType === "subscription"
-
-  // Halo effects (percentages 0 to 100)
-  hiddenConversionRate: number;
-  haloUpliftRate: number;
-
-  // Cost
-  omnivateMonthlyFee: number;
-
-  // Display
-  timeHorizonMonths: TimeHorizon;
+  dealValue: number; // USD per closed deal
 }
 
 /**
- * Every number the calculator displays. All revenue values are USD.
- * Subscription specific outputs are null when dealType === "one_time".
+ * Every number the calculator displays.
  */
 export interface CalculatorOutputs {
-  // Capacity and reach
-  monthlySendingCapacity: number;
-  contactsReachedPerMonth: number;
+  // Volume
+  emailsSentPerMonth: number;
+  contactsReached: number;
 
-  // Funnel stages
-  opensPerMonth: number;
-  repliesPerMonth: number;
-  positiveRepliesPerMonth: number;
-  meetingsPerMonth: number;
-  dealsPerMonth: number;
+  // Funnel stages (per month)
+  opens: number;
+  replies: number;
+  positiveReplies: number;
+  meetings: number;
+  deals: number;
 
-  // Direct revenue
-  directRevenueAnnualised: number;
-
-  // Subscription only
-  mrrAddedAnnualised: number | null;
-  customerLtv: number | null;
-  averageLifetimeMonths: number | null;
-
-  // Hidden pipeline
-  engagedSilentPerMonth: number;
-  hiddenDealsPerMonth: number;
-  hiddenRevenueAnnualised: number;
-
-  // Halo bonus
-  haloRevenueAnnualised: number;
-
-  // Total and ROI
-  totalRevenueAnnualised: number;
-  omnivateCostAnnualised: number;
-  roiNet: number;
-  roiMultiple: number;
-
-  // Sensitivity band (recomputed totalRevenueAnnualised with rates scaled)
-  totalRevenueLow: number;
-  totalRevenueHigh: number;
-
-  // Time horizon scaled
-  revenueAtHorizon: number;
-  costAtHorizon: number;
-  netAtHorizon: number;
+  // Revenue
+  revenuePerMonth: number;
+  revenuePerYear: number;
 }

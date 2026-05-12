@@ -1,42 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { calculateRoi } from "@/lib/calculations";
-import { DEFAULT_INPUTS, getDefaultsForMotion } from "@/lib/defaults";
-import type { CalculatorInputs, SalesMotion, TimeHorizon } from "@/lib/types";
+import {
+  DEFAULT_INPUTS,
+  LEADS_BY_SEQUENCE,
+} from "@/lib/defaults";
+import type { CalculatorInputs, SequenceSteps } from "@/lib/types";
 import { readInputsFromUrl, writeInputsToUrl } from "@/lib/url-state";
 import { ControlsPanel } from "@/components/calculator/ControlsPanel";
 import { FunnelViz } from "@/components/calculator/FunnelViz";
-import { HeroNumber } from "@/components/calculator/HeroNumber";
-import { RoiSummary } from "@/components/calculator/RoiSummary";
-import { ComparisonView } from "@/components/calculator/ComparisonView";
 import { PdfCaptureForm } from "@/components/calculator/PdfCaptureForm";
-import { TimeHorizonToggle } from "@/components/calculator/TimeHorizonToggle";
+import { RevenueHero } from "@/components/calculator/RevenueHero";
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
   const hasHydratedRef = useRef(false);
 
-  // On first mount, hydrate inputs from URL search params if any. Server side
-  // render uses defaults; this effect runs only on the client and replaces
-  // state if the visitor landed on a shared URL. The setState here is
-  // intentional one-time hydration on mount, which the new react-hooks rule
-  // flags as a generic anti-pattern; it is legitimate here.
   useEffect(() => {
     if (hasHydratedRef.current) return;
     hasHydratedRef.current = true;
     const fromUrl = readInputsFromUrl();
-    if (fromUrl !== DEFAULT_INPUTS) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setInputs(fromUrl);
-    }
+    if (fromUrl !== DEFAULT_INPUTS) setInputs(fromUrl);
   }, []);
 
-  // Whenever inputs change, mirror them into the URL (replaceState, not push,
-  // so the back button is not cluttered). Skipped until after hydration so
-  // we do not overwrite shared URLs with defaults on first render.
   useEffect(() => {
     if (!hasHydratedRef.current) return;
     writeInputsToUrl(inputs);
@@ -51,23 +39,15 @@ export default function Home() {
     setInputs((prev) => ({ ...prev, [key]: value }));
   }
 
-  function setMotion(motion: SalesMotion) {
-    // When motion changes, reset motion specific defaults but keep volume,
-    // conversion rates, halo, and cost the visitor has tweaked.
-    const motionDefaults = getDefaultsForMotion(motion);
+  function setStrategy(steps: SequenceSteps) {
+    // When the visitor picks a new sequence strategy, snap leadsReached to
+    // the natural value for that strategy. They can still drag the leads
+    // slider afterward to override.
     setInputs((prev) => ({
       ...prev,
-      salesMotion: motion,
-      closeRate: motionDefaults.closeRate,
-      dealType: motionDefaults.dealType,
-      dealValue: motionDefaults.dealValue,
-      monthlySubscriptionValue: motionDefaults.monthlySubscriptionValue,
-      monthlyChurnRate: motionDefaults.monthlyChurnRate,
+      sequenceSteps: steps,
+      leadsReached: LEADS_BY_SEQUENCE[steps],
     }));
-  }
-
-  function setTimeHorizon(horizon: TimeHorizon) {
-    setInputs((prev) => ({ ...prev, timeHorizonMonths: horizon }));
   }
 
   return (
@@ -77,14 +57,14 @@ export default function Home() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% -20%, hsl(var(--brand-primary) / 0.06), transparent 60%)",
+            "radial-gradient(ellipse 80% 60% at 50% -20%, hsl(var(--brand-primary) / 0.05), transparent 60%)",
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16 md:py-20 space-y-20 sm:space-y-24">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-14 md:py-18">
         {/* Header */}
         <header className="flex items-center justify-between">
-          <Link
+          <a
             href="/"
             aria-label="Omnivate ROI Calculator home"
             className="inline-flex items-center transition-opacity hover:opacity-80"
@@ -97,105 +77,78 @@ export default function Home() {
               priority
               className="h-8 w-auto sm:h-9"
             />
-          </Link>
+          </a>
           <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             ROI Calculator
           </span>
         </header>
 
         {/* Hero */}
-        <section className="space-y-8">
-          <HeroNumber
-            roiMultiple={outputs.roiMultiple}
-            totalRevenueLow={outputs.totalRevenueLow}
-            totalRevenueHigh={outputs.totalRevenueHigh}
-            timeHorizonMonths={inputs.timeHorizonMonths}
-          />
-          <div className="flex items-center gap-3">
-            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Time horizon
-            </span>
-            <TimeHorizonToggle
-              value={inputs.timeHorizonMonths}
-              onValueChange={setTimeHorizon}
-            />
-          </div>
+        <section className="mt-14 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Outbound GTM impact
+          </p>
+          <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl md:text-5xl">
+            See the revenue your outbound program can generate.
+          </h1>
+          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            Pick a sequence strategy, tune the performance, set your average
+            deal value. Every change updates the funnel and the projected
+            revenue immediately.
+          </p>
         </section>
 
-        {/* Controls + Funnel viz */}
-        <section className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-12">
-          <div className="lg:order-2">
+        {/* Headline result */}
+        <section className="mt-12">
+          <RevenueHero
+            revenuePerYear={outputs.revenuePerYear}
+            revenuePerMonth={outputs.revenuePerMonth}
+            deals={outputs.deals}
+            contactsReached={outputs.contactsReached}
+          />
+        </section>
+
+        {/* Controls + funnel viz */}
+        <section className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-12">
+          <div className="order-1">
+            <ControlsPanel
+              inputs={inputs}
+              onChange={setInput}
+              onStrategyChange={setStrategy}
+            />
+          </div>
+          <div className="order-2 lg:sticky lg:top-8 lg:self-start">
             <FunnelViz
-              contactsReached={outputs.contactsReachedPerMonth}
-              opens={outputs.opensPerMonth}
-              replies={outputs.repliesPerMonth}
-              positiveReplies={outputs.positiveRepliesPerMonth}
-              meetings={outputs.meetingsPerMonth}
-              deals={outputs.dealsPerMonth}
-              monthlySendingCapacity={outputs.monthlySendingCapacity}
+              contactsReached={outputs.contactsReached}
+              opens={outputs.opens}
+              replies={outputs.replies}
+              positiveReplies={outputs.positiveReplies}
+              meetings={outputs.meetings}
+              deals={outputs.deals}
               rates={{
                 open: inputs.openRate,
                 reply: inputs.replyRate,
                 positive: inputs.positiveReplyRate,
-                meeting: inputs.meetingBookingRate,
+                meeting: inputs.meetingBookedRate,
                 close: inputs.closeRate,
               }}
             />
           </div>
-          <div className="lg:order-1">
-            <ControlsPanel
-              inputs={inputs}
-              onChange={setInput}
-              onMotionChange={setMotion}
-              subscriptionInfo={
-                outputs.customerLtv !== null &&
-                outputs.averageLifetimeMonths !== null
-                  ? {
-                      customerLtv: outputs.customerLtv,
-                      averageLifetimeMonths: outputs.averageLifetimeMonths,
-                    }
-                  : null
-              }
-            />
-          </div>
         </section>
 
-        {/* ROI summary */}
-        <RoiSummary
-          directRevenue={outputs.directRevenueAnnualised}
-          hiddenRevenue={outputs.hiddenRevenueAnnualised}
-          haloRevenue={outputs.haloRevenueAnnualised}
-          totalRevenue={outputs.totalRevenueAnnualised}
-          totalRevenueLow={outputs.totalRevenueLow}
-          totalRevenueHigh={outputs.totalRevenueHigh}
-          dealsPerMonth={outputs.dealsPerMonth}
-          hiddenDealsPerMonth={outputs.hiddenDealsPerMonth}
-          haloUpliftRate={inputs.haloUpliftRate}
-          timeHorizonMonths={inputs.timeHorizonMonths}
-        />
-
-        {/* Without vs with comparison */}
-        <ComparisonView
-          totalRevenue={outputs.totalRevenueAnnualised}
-          totalCost={outputs.omnivateCostAnnualised}
-          roiNet={outputs.roiNet}
-          roiMultiple={outputs.roiMultiple}
-          timeHorizonMonths={inputs.timeHorizonMonths}
-        />
-
         {/* PDF capture */}
-        <PdfCaptureForm />
+        <section className="mt-20">
+          <PdfCaptureForm />
+        </section>
 
         {/* Footer */}
-        <footer className="border-t border-border pt-8">
+        <footer className="mt-16 border-t border-border pt-8">
           <div className="flex flex-col items-start justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
             <p>Built by Omnivate AI</p>
             <div className="flex items-center gap-4">
               <a
                 href="https://omnivate.ai/privacy-policy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground transition-colors"
+                className="transition-colors hover:text-foreground"
               >
                 Privacy
               </a>

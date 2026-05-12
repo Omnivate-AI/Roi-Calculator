@@ -16,27 +16,27 @@ Capture every decision, install, and quirk encountered during the project's tool
 
 ### Claude Code MCPs and skills
 
-| Tool | Type | Source | Notes |
-|---|---|---|---|
-| GitHub MCP | Connector | Pre-installed | Already configured at the user level. Used for repo operations during M2. |
-| Vercel MCP | Connector (HTTP) | `https://mcp.vercel.com` | Added via `claude mcp add --transport http vercel https://mcp.vercel.com`. OAuth happens on first invocation. |
+| Tool                    | Type                                             | Source                          | Notes                                                                                                                                         |
+| ----------------------- | ------------------------------------------------ | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| GitHub MCP              | Connector                                        | Pre-installed                   | Already configured at the user level. Used for repo operations during M2.                                                                     |
+| Vercel MCP              | Connector (HTTP)                                 | `https://mcp.vercel.com`        | Added via `claude mcp add --transport http vercel https://mcp.vercel.com`. OAuth happens on first invocation.                                 |
 | `example-skills` plugin | Plugin from `anthropic-agent-skills` marketplace | `anthropics/skills` GitHub repo | Bundles `frontend-design`, `theme-factory`, `brand-guidelines`, `web-artifacts-builder` and others. Used for M3 visual proposal and M4 build. |
 
 A leftover `vercel-dev` MCP entry from a prior machine config is still in settings and not connecting. Not blocking. Can be removed with `claude mcp remove vercel-dev` whenever convenient.
 
 ### Local dependencies
 
-* Node 22.12.0
-* pnpm (path: `C:/Users/HP/AppData/Roaming/npm/pnpm`)
-* GitHub CLI 2.x
+- Node 22.12.0
+- pnpm (path: `C:/Users/HP/AppData/Roaming/npm/pnpm`)
+- GitHub CLI 2.x
 
 ---
 
 ## Repo and project
 
-* GitHub repo: [`Omnivate-AI/Roi-Calculator`](https://github.com/Omnivate-AI/Roi-Calculator)
-* Local clone: `C:\Users\HP\Roi-Calculator\`
-* Default branch: `main`
+- GitHub repo: [`Omnivate-AI/Roi-Calculator`](https://github.com/Omnivate-AI/Roi-Calculator)
+- Local clone: `C:\Users\HP\Roi-Calculator\`
+- Default branch: `main`
 
 The repo name uses mixed casing (`Roi-Calculator`) which trips npm's package naming rules. Workaround: scaffolded into a temporary directory called `roi-calculator-scaffold`, moved files into the actual repo, then edited `package.json` to set `"name": "roi-calculator"` (lowercase). The directory name does not need to match the package name.
 
@@ -44,13 +44,13 @@ The repo name uses mixed casing (`Roi-Calculator`) which trips npm's package nam
 
 ## Next.js scaffold
 
-* Next.js 16.2.4 (App Router)
-* React 19.2.4
-* TypeScript 5
-* Tailwind CSS v4 (using new `@theme inline` syntax in `app/globals.css`)
-* ESLint 9 with `eslint-config-next`
-* No `src/` directory
-* Import alias: `@/*`
+- Next.js 16.2.4 (App Router)
+- React 19.2.4
+- TypeScript 5
+- Tailwind CSS v4 (using new `@theme inline` syntax in `app/globals.css`)
+- ESLint 9 with `eslint-config-next`
+- No `src/` directory
+- Import alias: `@/*`
 
 Scaffold command used:
 
@@ -64,10 +64,10 @@ A note on Next.js 16: this version has breaking changes from prior majors. The s
 
 ### Files customised after scaffold
 
-* `package.json` — name set to `roi-calculator`
-* `app/layout.tsx` — metadata title and description set to Omnivate ROI Calculator copy
-* `app/page.tsx` — replaced default Next.js boilerplate with a sophisticated dark placeholder reading "ROI Calculator. In development. Phase 2 of 5."
-* `README.md` — rewritten for the actual project
+- `package.json` — name set to `roi-calculator`
+- `app/layout.tsx` — metadata title and description set to Omnivate ROI Calculator copy
+- `app/page.tsx` — replaced default Next.js boilerplate with a sophisticated dark placeholder reading "ROI Calculator. In development. Phase 2 of 5."
+- `README.md` — rewritten for the actual project
 
 ### Local commands
 
@@ -84,18 +84,18 @@ pnpm lint         # eslint
 
 ### Account and project
 
-* Vercel username: `amzat-1257`
-* Active scope: `amzat-1257's projects` (personal scope, no Omnivate team membership yet)
-* Project: `roi-calculator` under `amzat-1257s-projects/roi-calculator`
-* Local link: `.vercel/` directory in repo root, gitignored
+- Vercel username: `amzat-1257`
+- Active scope: `amzat-1257's projects` (personal scope, no Omnivate team membership yet)
+- Project: `roi-calculator` under `amzat-1257s-projects/roi-calculator`
+- Local link: `.vercel/` directory in repo root, gitignored
 
 ### Live URL
 
 The first production deploy is live at:
 
-* Stable alias: **`https://roi-calculator-taupe-ten.vercel.app`**
-* Specific deployment: `https://roi-calculator-artf79u15-amzat-1257s-projects.vercel.app`
-* Vercel inspector: `https://vercel.com/amzat-1257s-projects/roi-calculator/dpl_5eUEpcjd7zahQMS5sr2JHirVq76a`
+- Stable alias: **`https://roi-calculator-taupe-ten.vercel.app`**
+- Specific deployment: `https://roi-calculator-artf79u15-amzat-1257s-projects.vercel.app`
+- Vercel inspector: `https://vercel.com/amzat-1257s-projects/roi-calculator/dpl_5eUEpcjd7zahQMS5sr2JHirVq76a`
 
 Build completed in 21 seconds, status `READY`, target `production`. The placeholder homepage renders correctly.
 
@@ -117,21 +117,21 @@ To eliminate the risk of accidentally committing a secret to the now public repo
 
 Setup details:
 
-* `husky` 9 manages git hooks via `.husky/pre-commit`
-* `secretlint` 13 with `@secretlint/secretlint-rule-preset-recommend` does the scanning
-* Config lives at `.secretlintrc.json` at the repo root
-* Manual scan: `pnpm exec secretlint --secretlintignore .gitignore "**/*"`
+- `husky` 9 manages git hooks via `.husky/pre-commit`
+- `secretlint` 13 with `@secretlint/secretlint-rule-preset-recommend` does the scanning
+- Config lives at `.secretlintrc.json` at the repo root
+- Manual scan: `pnpm exec secretlint --secretlintignore .gitignore "**/*"`
 
 ### Environment variables
 
 Four placeholder slots are configured in production:
 
-| Variable | Phase that uses it | Current value | Notes |
-|---|---|---|---|
-| `SMARTLEAD_API_KEY` | Phase 5 | `placeholder_set_in_phase_5` | Replace with the Omnivate Smartlead API key when wiring PDF delivery |
-| `SMARTLEAD_CAMPAIGN_ID` | Phase 5 | `placeholder_set_in_phase_5` | Replace with the transactional PDF delivery campaign ID created in Phase 5 |
-| `SUPABASE_URL` | Phase 5 | `placeholder_set_in_phase_5` | Supabase project URL for lead persistence |
-| `SUPABASE_SERVICE_ROLE_KEY` | Phase 5 | `placeholder_set_in_phase_5` | Service role key for server side writes from the API route |
+| Variable                    | Phase that uses it | Current value                | Notes                                                                      |
+| --------------------------- | ------------------ | ---------------------------- | -------------------------------------------------------------------------- |
+| `SMARTLEAD_API_KEY`         | Phase 5            | `placeholder_set_in_phase_5` | Replace with the Omnivate Smartlead API key when wiring PDF delivery       |
+| `SMARTLEAD_CAMPAIGN_ID`     | Phase 5            | `placeholder_set_in_phase_5` | Replace with the transactional PDF delivery campaign ID created in Phase 5 |
+| `SUPABASE_URL`              | Phase 5            | `placeholder_set_in_phase_5` | Supabase project URL for lead persistence                                  |
+| `SUPABASE_SERVICE_ROLE_KEY` | Phase 5            | `placeholder_set_in_phase_5` | Service role key for server side writes from the API route                 |
 
 Vercel does not allow truly empty env values, so a placeholder string is used. Replace with real values via the dashboard or `vercel env` CLI in Phase 5. No code references these variables yet, so the placeholders cause no runtime errors.
 
@@ -154,14 +154,11 @@ Vercel does not allow truly empty env values, so a placeholder string is used. R
 
 ## Outstanding for M2 sign off
 
-* [x] Frontend Design, GitHub MCP, and Vercel MCP installed and verified
-* [x] Next.js 16 scaffold committed to GitHub `main`
-* [x] `pnpm build` produces clean production build
-* [x] First successful Vercel deploy live at `https://roi-calculator-taupe-ten.vercel.app`
-* [x] Four env var slots configured (placeholder values, real values land in Phase 5)
-* [x] GitHub repo flipped to public with Omar approval
-* [x] Vercel auto deploy on push to `main` connected and working
-* [x] Pre commit hook with secretlint installed to prevent accidental secret commits
-* [ ] M2 Loom recorded showing the live URL, repo on GitHub, Vercel project, and the Frontend Design plugin responding in Claude Code
-
-Phase 3 (M3 requirements stack) can start as soon as Omar signs off on M2.
+- [x] Frontend Design, GitHub MCP, and Vercel MCP installed and verified
+- [x] Next.js 16 scaffold committed to GitHub `main`
+- [x] `pnpm build` produces clean production build
+- [x] First successful Vercel deploy live at `https://roi-calculator-taupe-ten.vercel.app`
+- [x] Four env var slots configured (placeholder values, real values land in Phase 5)
+- [x] GitHub repo flipped to public with Omar approval
+- [x] Vercel auto deploy on push to `main` connected and working
+- [x] Pre commit hook with secretlint installed to prevent accidental secret commits
