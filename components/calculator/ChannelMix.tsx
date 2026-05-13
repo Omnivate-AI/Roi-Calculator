@@ -2,7 +2,6 @@ import { Mail, Briefcase, Phone, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ChannelMixProps {
-  /** Current meeting booked rate (0-100). */
   meetingBookedRate: number;
 }
 
@@ -20,33 +19,45 @@ const CHANNELS: Channel[] = [
 ];
 
 /**
- * Visual representation of the follow-up channel mix implied by the current
- * meeting booked rate. Three pills: Email is always lit, LinkedIn lights up
- * at 50%, cold calling lights up at 75%. Replaces the tiny text tick label
- * with something visitors immediately understand.
+ * Visual representation of the follow-up channel mix implied by the
+ * current meeting booked rate. Three pills connect into a sequence; each
+ * lights up as the rate crosses its threshold. A contextual nudge below
+ * tells the visitor what to add next.
  */
 export function ChannelMix({ meetingBookedRate }: ChannelMixProps) {
   const next = CHANNELS.find((c) => meetingBookedRate < c.threshold);
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2 rounded-lg border border-border/60 bg-muted/40 p-2.5">
       <div className="flex items-center gap-1.5">
-        {CHANNELS.map((channel) => {
+        {CHANNELS.map((channel, index) => {
           const active = meetingBookedRate >= channel.threshold;
           return (
-            <div
-              key={channel.key}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-[11px] font-medium transition-colors",
-                active
-                  ? "border-brand-primary/30 bg-brand-primary/10 text-brand-primary"
-                  : "border-border bg-card text-muted-foreground/60"
-              )}
-            >
-              <channel.Icon className="h-3 w-3" strokeWidth={2.5} />
-              <span>{channel.label}</span>
-              {active && (
-                <Check className="h-2.5 w-2.5" strokeWidth={3} />
+            <div key={channel.key} className="flex items-center gap-1.5">
+              <div
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-semibold transition-all",
+                  active
+                    ? "border-brand-primary/40 bg-brand-primary/10 text-brand-primary shadow-[0_1px_4px_-1px_hsl(var(--brand-primary)/0.3)]"
+                    : "border-border bg-background text-muted-foreground/50"
+                )}
+              >
+                <channel.Icon className="h-3 w-3" strokeWidth={2.5} />
+                <span>{channel.label}</span>
+                {active && (
+                  <Check className="h-2.5 w-2.5" strokeWidth={3} />
+                )}
+              </div>
+              {index < CHANNELS.length - 1 && (
+                <span
+                  aria-hidden
+                  className={cn(
+                    "h-px w-2 transition-colors",
+                    meetingBookedRate >= CHANNELS[index + 1].threshold
+                      ? "bg-brand-primary/40"
+                      : "bg-border"
+                  )}
+                />
               )}
             </div>
           );
@@ -54,8 +65,9 @@ export function ChannelMix({ meetingBookedRate }: ChannelMixProps) {
       </div>
       {next ? (
         <p className="text-[11px] leading-relaxed text-muted-foreground">
-          Add <span className="font-medium text-foreground">{next.label}</span> to push past{" "}
-          {next.threshold}%.
+          Layer in{" "}
+          <span className="font-semibold text-foreground">{next.label}</span> to
+          push past {next.threshold}%.
         </p>
       ) : (
         <p className="text-[11px] leading-relaxed text-muted-foreground">

@@ -1,5 +1,6 @@
 "use client";
 
+import { Target, BarChart3 } from "lucide-react";
 import type { CalculatorInputs } from "@/lib/types";
 import { BenchmarkSlider } from "./BenchmarkSlider";
 import { ChannelMix } from "./ChannelMix";
@@ -16,10 +17,8 @@ interface ControlsPanelProps {
 }
 
 /**
- * Compact two-column controls panel for V3. Strategy and reach inputs at
- * the top, performance sliders in a responsive grid below. Each slider has
- * an inline help icon for educational popovers; meeting booked rate also
- * shows a channel mix visualization beneath the badge.
+ * Two-section controls panel. Each section has an icon header that
+ * matches the visual weight of the funnel/metrics panels on the right.
  */
 export function ControlsPanel({
   inputs,
@@ -28,7 +27,11 @@ export function ControlsPanel({
 }: ControlsPanelProps) {
   return (
     <div className="space-y-6">
-      <Section title="Strategy">
+      <Section
+        icon={<Target className="h-3.5 w-3.5" strokeWidth={2.5} />}
+        title="Strategy"
+        subtitle="Pick how broad your outbound program runs."
+      >
         <StrategyToggle
           value={inputs.sequenceSteps}
           onValueChange={onStrategyChange}
@@ -47,7 +50,11 @@ export function ControlsPanel({
         </div>
       </Section>
 
-      <Section title="Campaign performance">
+      <Section
+        icon={<BarChart3 className="h-3.5 w-3.5" strokeWidth={2.5} />}
+        title="Campaign performance"
+        subtitle="Tune the conversion at each funnel stage."
+      >
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <BenchmarkSlider
             field="openRate"
@@ -98,7 +105,7 @@ interface DealValueCardProps {
 
 function DealValueCard({ value, onValueChange }: DealValueCardProps) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="rounded-xl border border-border bg-card p-4 transition-all hover:border-brand-primary/30">
       <NumberInput
         label="Average deal value"
         value={value}
@@ -107,23 +114,33 @@ function DealValueCard({ value, onValueChange }: DealValueCardProps) {
         step={500}
         prefix="$"
         onValueChange={onValueChange}
-        helper="One time deal price or annualised contract value."
+        helper="One time price or annualised contract value."
       />
     </div>
   );
 }
 
 interface SectionProps {
+  icon: React.ReactNode;
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
 }
 
-function Section({ title, children }: SectionProps) {
+function Section({ icon, title, subtitle, children }: SectionProps) {
   return (
     <section className="space-y-3">
-      <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-        {title}
-      </h3>
+      <div className="flex items-center gap-2.5">
+        <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
+          {icon}
+        </span>
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+          {subtitle && (
+            <p className="text-[11px] text-muted-foreground">{subtitle}</p>
+          )}
+        </div>
+      </div>
       <div className="space-y-3">{children}</div>
     </section>
   );

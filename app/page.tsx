@@ -46,12 +46,25 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground">
+      {/* Background gradient mesh */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
-          background:
-            "radial-gradient(ellipse 80% 50% at 50% -10%, hsl(var(--brand-primary) / 0.06), transparent 55%)",
+          backgroundImage: `
+            radial-gradient(ellipse 60% 40% at 15% 0%, hsl(var(--brand-primary) / 0.08), transparent 55%),
+            radial-gradient(ellipse 50% 35% at 90% 10%, hsl(var(--brand-accent) / 0.06), transparent 55%),
+            radial-gradient(ellipse 40% 30% at 50% 100%, hsl(var(--brand-secondary) / 0.04), transparent 50%)
+          `,
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.015]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at center, hsl(var(--foreground)) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
         }}
       />
 
@@ -72,25 +85,31 @@ export default function Home() {
               className="h-7 w-auto sm:h-8"
             />
           </a>
-          <span className="rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-            ROI Calculator
-          </span>
+          <div className="flex items-center gap-2 rounded-full border border-brand-primary/20 bg-brand-primary/5 px-3 py-1.5">
+            <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-brand-primary" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-primary">
+              Outbound ROI Calculator
+            </span>
+          </div>
         </header>
 
         {/* Brief title */}
-        <section className="mt-6 space-y-2">
-          <h1 className="text-balance text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl">
-            Outbound GTM revenue calculator
+        <section className="mt-7 max-w-3xl space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary">
+            Run the numbers
+          </p>
+          <h1 className="text-balance text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-[2.5rem]">
+            See the revenue an outbound program can generate.
           </h1>
-          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Pick a sequence strategy, tune the performance, set your deal value.
-            Tap the help icons to learn what each metric means and what good
-            looks like.
+          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Pick a sequence strategy, tune the performance, set your average
+            deal value. Tap the help icons inside each card to learn what every
+            metric means and what good looks like.
           </p>
         </section>
 
         {/* Controls at the top, full width */}
-        <section className="mt-6">
+        <section className="mt-8">
           <ControlsPanel
             inputs={inputs}
             onChange={setInput}

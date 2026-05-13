@@ -5,6 +5,7 @@ import { HelpCircle } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
   BENCHMARK_THRESHOLDS,
+  SLIDER_ANCHORS,
   SLIDER_EXPLAINERS,
   SLIDER_LIMITS,
   statusFor,
@@ -22,7 +23,7 @@ interface BenchmarkSliderProps {
   unit?: string;
   formatValue?: (n: number) => string;
   onValueChange: (value: number) => void;
-  /** Extra content rendered below the status badge (e.g. ChannelMix). */
+  /** Extra content rendered below the status row (e.g. ChannelMix). */
   footerSlot?: ReactNode;
 }
 
@@ -33,18 +34,42 @@ const STATUS_LABEL: Record<BenchmarkStatus, string> = {
   benchmark: "Benchmark",
 };
 
-const STATUS_STYLES: Record<BenchmarkStatus, { dot: string; text: string; bg: string }> = {
-  poor: { dot: "bg-destructive", text: "text-destructive", bg: "bg-destructive/10" },
-  average: { dot: "bg-warning", text: "text-warning", bg: "bg-warning/10" },
-  healthy: { dot: "bg-brand-primary", text: "text-brand-primary", bg: "bg-brand-primary/10" },
-  benchmark: { dot: "bg-success", text: "text-success", bg: "bg-success/10" },
+const STATUS_STYLES: Record<
+  BenchmarkStatus,
+  { dot: string; text: string; bg: string; ring: string }
+> = {
+  poor: {
+    dot: "bg-destructive",
+    text: "text-destructive",
+    bg: "bg-destructive/10",
+    ring: "ring-destructive/20",
+  },
+  average: {
+    dot: "bg-warning",
+    text: "text-warning",
+    bg: "bg-warning/10",
+    ring: "ring-warning/20",
+  },
+  healthy: {
+    dot: "bg-brand-primary",
+    text: "text-brand-primary",
+    bg: "bg-brand-primary/10",
+    ring: "ring-brand-primary/20",
+  },
+  benchmark: {
+    dot: "bg-success",
+    text: "text-success",
+    bg: "bg-success/10",
+    ring: "ring-success/20",
+  },
 };
 
 /**
- * Compact slider card. Label with help icon (tap to read what the metric
- * means), value display, slider, tick markers at benchmark thresholds, and
- * a status badge below the track. Optional footerSlot for richer guidance
- * (e.g. a channel mix indicator on the meeting booked rate).
+ * Refined slider card with anchor labels at the slider extremities, a
+ * larger gradient track via the upgraded Slider primitive, a help icon
+ * popover for educational context, and a richer status pill below the
+ * track. Supports an optional footerSlot for slider-specific guidance
+ * (e.g. the channel mix on meeting booked rate).
  */
 export function BenchmarkSlider({
   field,
@@ -58,6 +83,7 @@ export function BenchmarkSlider({
 }: BenchmarkSliderProps) {
   const limits = SLIDER_LIMITS[field];
   const thresholds = BENCHMARK_THRESHOLDS[field];
+  const anchors = SLIDER_ANCHORS[field];
   const status = statusFor(field, value);
   const styles = STATUS_STYLES[status];
   const explainer = SLIDER_EXPLAINERS[field];
@@ -74,18 +100,18 @@ export function BenchmarkSlider({
     }));
 
   return (
-    <div className="space-y-2.5 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-[0_4px_12px_-4px_hsl(220_43%_11%_/_0.08)]">
+    <div className="group rounded-xl border border-border bg-card p-4 transition-all hover:border-brand-primary/30 hover:shadow-[0_8px_24px_-8px_hsl(var(--brand-primary)/0.15)]">
       <div className="flex items-baseline justify-between gap-2">
         <div className="flex items-center gap-1.5">
-          <label className="text-sm font-medium text-foreground">{label}</label>
+          <label className="text-sm font-semibold text-foreground">{label}</label>
           <HelpIcon title={explainer.title} body={explainer.body} />
         </div>
-        <span className="font-mono text-sm font-semibold tabular-nums text-foreground">
+        <span className="font-mono text-lg font-semibold tabular-nums text-foreground">
           {formatted}
         </span>
       </div>
 
-      <div className="relative pb-3">
+      <div className="relative mt-4 pb-3">
         <Slider
           value={[value]}
           min={limits.min}
@@ -97,12 +123,12 @@ export function BenchmarkSlider({
         {tickMarkers.length > 0 && (
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-1.5 h-1"
+            className="pointer-events-none absolute inset-x-0 top-2 h-1"
           >
             {tickMarkers.map((marker) => (
               <span
                 key={marker.tick}
-                className="absolute h-1.5 w-px -translate-x-1/2 bg-border"
+                className="absolute h-1 w-px -translate-x-1/2 rounded-full bg-foreground/30"
                 style={{ left: `${marker.percent}%` }}
               />
             ))}
@@ -110,28 +136,38 @@ export function BenchmarkSlider({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+        <span className="truncate uppercase tracking-[0.08em]">{anchors.left}</span>
+        <span className="truncate text-right uppercase tracking-[0.08em]">
+          {anchors.right}
+        </span>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-2">
         <div
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold",
+            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1",
             styles.bg,
-            styles.text
+            styles.text,
+            styles.ring
           )}
         >
           <span className={cn("h-1.5 w-1.5 rounded-full", styles.dot)} />
           {STATUS_LABEL[status]}
         </div>
         {tickMarkers.length > 0 && (
-          <span className="truncate text-[11px] text-muted-foreground">
+          <span className="truncate text-xs font-medium text-foreground/70">
             {currentTickLabel(value, BENCHMARK_THRESHOLDS[field])}
           </span>
         )}
       </div>
 
-      {footerSlot && <div className="pt-1">{footerSlot}</div>}
+      {footerSlot && <div className="mt-3">{footerSlot}</div>}
 
       {helper && (
-        <p className="text-[11px] leading-relaxed text-muted-foreground">{helper}</p>
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+          {helper}
+        </p>
       )}
     </div>
   );
@@ -142,10 +178,6 @@ interface HelpIconProps {
   body: string;
 }
 
-/**
- * Click to open educational popover. Plain CSS positioning, no Radix
- * Popover dependency. Closes on outside click or escape.
- */
 function HelpIcon({ title, body }: HelpIconProps) {
   const [open, setOpen] = useState(false);
 
@@ -158,7 +190,7 @@ function HelpIcon({ title, body }: HelpIconProps) {
           setOpen((current) => !current);
         }}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="inline-flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground hover:text-foreground focus:outline-none focus:text-brand-primary"
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-brand-primary focus:outline-none focus:text-brand-primary"
         aria-label={`Explain ${title}`}
         aria-expanded={open}
       >
@@ -168,7 +200,7 @@ function HelpIcon({ title, body }: HelpIconProps) {
         <span
           role="dialog"
           aria-label={title}
-          className="absolute left-0 top-6 z-30 w-72 rounded-lg border border-border bg-popover p-3 text-left shadow-[0_8px_24px_-8px_hsl(220_43%_11%_/_0.18)]"
+          className="absolute left-0 top-6 z-30 w-72 rounded-lg border border-border bg-popover p-3 text-left shadow-[0_12px_32px_-8px_hsl(220_43%_11%_/_0.2)]"
         >
           <span className="block text-xs font-semibold text-foreground">
             {title}

@@ -156,6 +156,25 @@ export function statusFor(
 }
 
 /**
+ * Anchor labels rendered at the extremes of each slider track, in the
+ * spirit of the reference cold-email-roi-calculator.com ("Solo → 20 reps",
+ * "Sticky → high churn"). Gives visitors immediate context for what the
+ * minimum and maximum values represent.
+ */
+export const SLIDER_ANCHORS: Record<
+  keyof typeof SLIDER_LIMITS,
+  { left: string; right: string }
+> = {
+  leadsReached: { left: "Narrow reach", right: "Maximum reach" },
+  openRate: { left: "Deliverability issue", right: "Best in class" },
+  replyRate: { left: "Cold and quiet", right: "Best in class" },
+  positiveReplyRate: { left: "Wrong audience", right: "Top of market" },
+  meetingBookedRate: { left: "Email only", right: "Multi channel" },
+  closeRate: { left: "Pipeline leak", right: "Top of market" },
+  dealValue: { left: "Tiny tickets", right: "Enterprise" },
+};
+
+/**
  * Plain-English explainer content shown in the popover when a visitor taps
  * the help icon next to a slider label. Keeps the helper text short and
  * lets curious visitors dig deeper without crowding the surface UI.
