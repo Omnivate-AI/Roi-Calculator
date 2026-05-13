@@ -5,6 +5,8 @@ import { formatInteger, formatPercent } from "@/lib/utils";
 import { TweenedNumber } from "./TweenedNumber";
 
 interface FunnelVizProps {
+  emailsSent: number;
+  sequenceSteps: number;
   contactsReached: number;
   opens: number;
   replies: number;
@@ -23,16 +25,18 @@ interface FunnelVizProps {
 interface Stage {
   label: string;
   value: number;
-  conversion?: { rate: number };
+  conversion?: { rate?: number; customLabel?: string };
 }
 
 /**
- * True funnel visualization with a tapered shape. Each stage row centers
- * the bar so the overall shape is an inverted trapezoid, the visual
- * signature of a sales funnel. Stage colors deepen through the funnel,
- * conversion rates float between rows in muted mono.
+ * True funnel visualization with a tapered shape. Stages: emails sent →
+ * leads reached → opens → replies → positive → meetings → deals. Bar
+ * widths scale relative to emails sent (the largest stage) and centre
+ * align so the overall outline reads as a trapezoid.
  */
 export function FunnelViz({
+  emailsSent,
+  sequenceSteps,
   contactsReached,
   opens,
   replies,
@@ -42,7 +46,14 @@ export function FunnelViz({
   rates,
 }: FunnelVizProps) {
   const stages: Stage[] = [
-    { label: "Leads reached", value: contactsReached },
+    { label: "Emails sent", value: emailsSent },
+    {
+      label: "Leads reached",
+      value: contactsReached,
+      conversion: {
+        customLabel: `${sequenceSteps} email${sequenceSteps > 1 ? "s" : ""} per lead`,
+      },
+    },
     { label: "Opens", value: opens, conversion: { rate: rates.open } },
     { label: "Replies", value: replies, conversion: { rate: rates.reply } },
     {
@@ -79,23 +90,25 @@ export function FunnelViz({
       <div className="space-y-2">
         {stages.map((stage, index) => {
           const widthPercent = Math.max(8, (stage.value / maxValue) * 100);
-          const opacity = 1 - index * 0.08;
+          const opacity = 1 - index * 0.07;
           return (
             <div key={stage.label}>
               {stage.conversion && (
                 <div className="flex justify-center text-[10px] text-muted-foreground/80">
                   <span className="font-mono tabular-nums">
-                    {formatPercent(stage.conversion.rate)}
+                    {stage.conversion.customLabel ??
+                      formatPercent(stage.conversion.rate ?? 0)}
                   </span>
                 </div>
               )}
               <div className="flex items-center gap-3">
-                <div className="flex-1 flex justify-center">
+                <div className="flex flex-1 justify-center">
                   <div
-                    className="h-8 rounded-md transition-[width] duration-500 ease-out shadow-[0_1px_2px_0_hsl(var(--brand-primary)/0.2)]"
+                    className="h-7 rounded-md shadow-[0_1px_2px_0_hsl(var(--brand-primary)/0.2)] transition-[width] duration-500 ease-out"
                     style={{
                       width: `${widthPercent}%`,
-                      background: `linear-gradient(135deg, hsl(var(--brand-primary)) 0%, hsl(var(--brand-secondary)) 100%)`,
+                      background:
+                        "linear-gradient(135deg, hsl(var(--brand-primary)) 0%, hsl(var(--brand-secondary)) 100%)",
                       opacity,
                     }}
                   />

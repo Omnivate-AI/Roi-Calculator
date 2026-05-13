@@ -126,6 +126,8 @@ export default function Home() {
         {/* Funnel viz below the fold for the curious */}
         <section className="mt-5">
           <FunnelViz
+            emailsSent={outputs.emailsSentPerMonth}
+            sequenceSteps={inputs.sequenceSteps}
             contactsReached={outputs.contactsReached}
             opens={outputs.opens}
             replies={outputs.replies}
