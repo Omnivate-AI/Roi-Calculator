@@ -17,8 +17,8 @@ interface ControlsPanelProps {
 }
 
 /**
- * Two-section controls panel. Each section has an icon header that
- * matches the visual weight of the funnel/metrics panels on the right.
+ * Two-section controls panel. Strategy on the left, deal value on the
+ * right; performance sliders in a 3-column grid below for compactness.
  */
 export function ControlsPanel({
   inputs,
@@ -26,22 +26,16 @@ export function ControlsPanel({
   onStrategyChange,
 }: ControlsPanelProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <Section
         icon={<Target className="h-3.5 w-3.5" strokeWidth={2.5} />}
         title="Strategy"
-        subtitle="Pick how broad your outbound program runs."
+        subtitle="Pick the sequence shape and set your deal value."
       >
-        <StrategyToggle
-          value={inputs.sequenceSteps}
-          onValueChange={onStrategyChange}
-        />
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-          <BenchmarkSlider
-            field="leadsReached"
-            label="Unique leads reached / month"
-            value={inputs.leadsReached}
-            onValueChange={(v) => onChange("leadsReached", v)}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <StrategyToggle
+            value={inputs.sequenceSteps}
+            onValueChange={onStrategyChange}
           />
           <DealValueCard
             value={inputs.dealValue}
@@ -53,9 +47,9 @@ export function ControlsPanel({
       <Section
         icon={<BarChart3 className="h-3.5 w-3.5" strokeWidth={2.5} />}
         title="Campaign performance"
-        subtitle="Tune the conversion at each funnel stage."
+        subtitle="Tune each funnel stage. Status colour updates live."
       >
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
           <BenchmarkSlider
             field="openRate"
             label="Open rate"
@@ -105,7 +99,7 @@ interface DealValueCardProps {
 
 function DealValueCard({ value, onValueChange }: DealValueCardProps) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4 transition-all hover:border-brand-primary/30">
+    <div className="rounded-xl border border-border bg-card p-3.5 transition-all hover:border-brand-primary/30">
       <NumberInput
         label="Average deal value"
         value={value}
@@ -129,7 +123,7 @@ interface SectionProps {
 
 function Section({ icon, title, subtitle, children }: SectionProps) {
   return (
-    <section className="space-y-3">
+    <section className="space-y-2.5">
       <div className="flex items-center gap-2.5">
         <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
           {icon}

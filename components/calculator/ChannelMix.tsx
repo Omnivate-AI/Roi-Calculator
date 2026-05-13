@@ -12,17 +12,20 @@ interface Channel {
   threshold: number;
 }
 
+// Thresholds aligned to the new 0-50 range:
+//   Below 25% = email only
+//   25% to 40% = email + LinkedIn
+//   40%+ = email + LinkedIn + cold calling
 const CHANNELS: Channel[] = [
   { key: "email", label: "Email", Icon: Mail, threshold: 0 },
-  { key: "linkedin", label: "LinkedIn", Icon: Briefcase, threshold: 50 },
-  { key: "phone", label: "Cold calling", Icon: Phone, threshold: 75 },
+  { key: "linkedin", label: "LinkedIn", Icon: Briefcase, threshold: 25 },
+  { key: "phone", label: "Cold calling", Icon: Phone, threshold: 40 },
 ];
 
 /**
- * Visual representation of the follow-up channel mix implied by the
- * current meeting booked rate. Three pills connect into a sequence; each
- * lights up as the rate crosses its threshold. A contextual nudge below
- * tells the visitor what to add next.
+ * Visual channel mix: three pills connected by short lines that light up
+ * as the meeting booked rate crosses each threshold. Plus a contextual
+ * nudge for what to add next.
  */
 export function ChannelMix({ meetingBookedRate }: ChannelMixProps) {
   const next = CHANNELS.find((c) => meetingBookedRate < c.threshold);
@@ -44,9 +47,7 @@ export function ChannelMix({ meetingBookedRate }: ChannelMixProps) {
               >
                 <channel.Icon className="h-3 w-3" strokeWidth={2.5} />
                 <span>{channel.label}</span>
-                {active && (
-                  <Check className="h-2.5 w-2.5" strokeWidth={3} />
-                )}
+                {active && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
               </div>
               {index < CHANNELS.length - 1 && (
                 <span
@@ -71,8 +72,7 @@ export function ChannelMix({ meetingBookedRate }: ChannelMixProps) {
         </p>
       ) : (
         <p className="text-[11px] leading-relaxed text-muted-foreground">
-          Multi channel motion fully activated. You are at the top end of what
-          cold outbound can produce.
+          Multi channel motion fully activated.
         </p>
       )}
     </div>

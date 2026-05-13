@@ -32,8 +32,8 @@ export function searchParamsToInputs(
     leadsReached: parseNumber(
       params.get("leadsReached"),
       DEFAULT_INPUTS.leadsReached,
-      SLIDER_LIMITS.leadsReached.min,
-      SLIDER_LIMITS.leadsReached.max
+      0,
+      30_000
     ),
     openRate: parseNumber(
       params.get("openRate"),

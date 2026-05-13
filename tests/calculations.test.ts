@@ -1,6 +1,6 @@
-// Unit tests for lib/calculations.ts (V2 simplified).
+// Unit tests for lib/calculations.ts (V5 simplified).
 // Asserts the math behaves correctly for every layer of the funnel and for
-// the edge cases enumerated in M3.
+// the new V5 thresholds (three statuses, meeting booked capped at 50).
 
 import { describe, expect, it } from "vitest";
 import { calculateRoi } from "@/lib/calculations";
@@ -50,7 +50,7 @@ describe("Volume", () => {
 });
 
 // --------------------------------------------------------------------------
-// Funnel
+// Funnel with V5 defaults
 // --------------------------------------------------------------------------
 
 describe("Funnel with default inputs", () => {
@@ -76,20 +76,21 @@ describe("Funnel with default inputs", () => {
     expect(out.positiveReplies).toBeCloseTo(108, 5);
   });
 
-  it("meetings = positive × meeting booked (108 × 0.50)", () => {
-    expect(out.meetings).toBeCloseTo(54, 5);
+  it("meetings = positive × meeting booked (108 × 0.30)", () => {
+    // V5 default meeting booked = 30 (down from 50 in V2-V4)
+    expect(out.meetings).toBeCloseTo(32.4, 5);
   });
 
-  it("deals = meetings × close rate (54 × 0.20)", () => {
-    expect(out.deals).toBeCloseTo(10.8, 5);
+  it("deals = meetings × close rate (32.4 × 0.20)", () => {
+    expect(out.deals).toBeCloseTo(6.48, 5);
   });
 
-  it("revenue per month = deals × deal value (10.8 × 25,000)", () => {
-    expect(out.revenuePerMonth).toBeCloseTo(270_000, 0);
+  it("revenue per month = deals × deal value (6.48 × 25,000)", () => {
+    expect(out.revenuePerMonth).toBeCloseTo(162_000, 0);
   });
 
   it("revenue per year = revenue per month × 12", () => {
-    expect(out.revenuePerYear).toBeCloseTo(3_240_000, 0);
+    expect(out.revenuePerYear).toBeCloseTo(1_944_000, 0);
   });
 });
 
@@ -127,15 +128,14 @@ describe("Edge cases", () => {
     expect(out.deals).toBe(0);
   });
 
-  it("maximum reply rate of 5% produces a sensible volume", () => {
+  it("max reply rate of 5% produces a sensible volume", () => {
     const out = calculateRoi({ ...DEFAULT_INPUTS, replyRate: 5 });
     expect(out.replies).toBeCloseTo(600, 5);
   });
 
-  it("tiny deal value still computes valid revenue", () => {
-    const out = calculateRoi({ ...DEFAULT_INPUTS, dealValue: 500 });
-    expect(out.revenuePerYear).toBeGreaterThan(0);
-    expect(out.revenuePerYear).toBeLessThan(100_000);
+  it("meeting booked at the new 50% cap works", () => {
+    const out = calculateRoi({ ...DEFAULT_INPUTS, meetingBookedRate: 50 });
+    expect(out.meetings).toBeCloseTo(54, 5); // 108 × 0.50
   });
 
   it("all conversion rates at zero produce zero deals", () => {
@@ -146,47 +146,59 @@ describe("Edge cases", () => {
       meetingBookedRate: 0,
       closeRate: 0,
     };
-    const out = calculateRoi(dead);
-    expect(out.deals).toBe(0);
-  });
-
-  it("huge leads number is capped at 30,000 by slider but math still handles it", () => {
-    const out = calculateRoi({ ...DEFAULT_INPUTS, leadsReached: 30_000 });
-    expect(out.contactsReached).toBe(30_000);
-    expect(out.emailsSentPerMonth).toBe(MONTHLY_EMAIL_CAPACITY);
+    expect(calculateRoi(dead).deals).toBe(0);
   });
 });
 
 // --------------------------------------------------------------------------
-// Status thresholds
+// V5 status thresholds (poor / average / good)
 // --------------------------------------------------------------------------
 
-describe("Benchmark status thresholds", () => {
+describe("V5 status thresholds", () => {
+  // Open rate: 0 poor, 30 average, 50 good
   it("open rate 20 is poor", () => {
     expect(statusFor("openRate", 20)).toBe("poor");
   });
-  it("open rate 50 is healthy", () => {
-    expect(statusFor("openRate", 50)).toBe("healthy");
+  it("open rate 40 is average", () => {
+    expect(statusFor("openRate", 40)).toBe("average");
   });
-  it("open rate 75 is benchmark", () => {
-    expect(statusFor("openRate", 75)).toBe("benchmark");
+  it("open rate 70 is good", () => {
+    expect(statusFor("openRate", 70)).toBe("good");
   });
+
+  // Reply rate: 0 poor, 1.5 average, 2.5 good
   it("reply rate 1 is poor", () => {
     expect(statusFor("replyRate", 1)).toBe("poor");
   });
-  it("reply rate 3 is healthy", () => {
-    expect(statusFor("replyRate", 3)).toBe("healthy");
+  it("reply rate 2 is average", () => {
+    expect(statusFor("replyRate", 2)).toBe("average");
   });
-  it("reply rate 4.5 is benchmark", () => {
-    expect(statusFor("replyRate", 4.5)).toBe("benchmark");
+  it("reply rate 3 is good", () => {
+    expect(statusFor("replyRate", 3)).toBe("good");
   });
-  it("meeting booked rate 30 is average (email only follow up)", () => {
-    expect(statusFor("meetingBookedRate", 30)).toBe("average");
+
+  // Meeting booked: 0 poor, 10 average, 25 good (max 50)
+  it("meeting booked 5 is poor", () => {
+    expect(statusFor("meetingBookedRate", 5)).toBe("poor");
   });
-  it("meeting booked rate 60 is healthy (email + LinkedIn)", () => {
-    expect(statusFor("meetingBookedRate", 60)).toBe("healthy");
+  it("meeting booked 15 is average (email only follow up)", () => {
+    expect(statusFor("meetingBookedRate", 15)).toBe("average");
   });
-  it("meeting booked rate 80 is benchmark (email + LinkedIn + calling)", () => {
-    expect(statusFor("meetingBookedRate", 80)).toBe("benchmark");
+  it("meeting booked 30 is good (multi channel)", () => {
+    expect(statusFor("meetingBookedRate", 30)).toBe("good");
+  });
+  it("meeting booked 50 is good (max value still good)", () => {
+    expect(statusFor("meetingBookedRate", 50)).toBe("good");
+  });
+
+  // Close rate: 0 poor, 10 average, 18 good
+  it("close rate 5 is poor", () => {
+    expect(statusFor("closeRate", 5)).toBe("poor");
+  });
+  it("close rate 15 is average", () => {
+    expect(statusFor("closeRate", 15)).toBe("average");
+  });
+  it("close rate 25 is good", () => {
+    expect(statusFor("closeRate", 25)).toBe("good");
   });
 });

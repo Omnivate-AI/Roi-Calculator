@@ -68,7 +68,7 @@ export default function Home() {
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 md:py-10">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6 md:py-8">
         {/* Header */}
         <header className="flex items-center justify-between">
           <a
@@ -93,23 +93,29 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Brief title */}
-        <section className="mt-7 max-w-3xl space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary">
-            Run the numbers
-          </p>
-          <h1 className="text-balance text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-[2.5rem]">
-            See the revenue an outbound program can generate.
-          </h1>
-          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Pick a sequence strategy, tune the performance, set your average
-            deal value. Tap the help icons inside each card to learn what every
-            metric means and what good looks like.
-          </p>
+        {/* Title + live metrics, side by side at top */}
+        <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end">
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary">
+              Run the numbers
+            </p>
+            <h1 className="text-balance text-2xl font-bold leading-[1.15] tracking-tight text-foreground sm:text-3xl">
+              See the revenue an outbound program can generate.
+            </h1>
+            <p className="max-w-xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
+              Pick a sequence strategy, tune the performance, set your average
+              deal value. Tap the help icons inside each card for plain English
+              explanations.
+            </p>
+          </div>
+          <MetricsPanel
+            revenuePerMonth={outputs.revenuePerMonth}
+            dealsPerMonth={outputs.deals}
+          />
         </section>
 
-        {/* Controls at the top, full width */}
-        <section className="mt-8">
+        {/* Controls take the bulk of the page */}
+        <section className="mt-6">
           <ControlsPanel
             inputs={inputs}
             onChange={setInput}
@@ -117,8 +123,8 @@ export default function Home() {
           />
         </section>
 
-        {/* Results: funnel left, metrics right */}
-        <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        {/* Funnel viz below the fold for the curious */}
+        <section className="mt-5">
           <FunnelViz
             contactsReached={outputs.contactsReached}
             opens={outputs.opens}
@@ -134,20 +140,15 @@ export default function Home() {
               close: inputs.closeRate,
             }}
           />
-          <MetricsPanel
-            revenuePerYear={outputs.revenuePerYear}
-            revenuePerMonth={outputs.revenuePerMonth}
-            dealsPerMonth={outputs.deals}
-          />
         </section>
 
         {/* PDF capture */}
-        <section className="mt-8">
+        <section className="mt-6">
           <PdfCaptureForm />
         </section>
 
         {/* Footer */}
-        <footer className="mt-10 border-t border-border pt-5">
+        <footer className="mt-8 border-t border-border pt-4">
           <div className="flex flex-col items-start justify-between gap-3 text-[11px] text-muted-foreground sm:flex-row">
             <p>Built by Omnivate AI</p>
             <div className="flex items-center gap-4">

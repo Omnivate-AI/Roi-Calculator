@@ -8,6 +8,7 @@ import {
   SLIDER_ANCHORS,
   SLIDER_EXPLAINERS,
   SLIDER_LIMITS,
+  STATUS_CONTEXT,
   statusFor,
 } from "@/lib/defaults";
 import type { BenchmarkStatus } from "@/lib/types";
@@ -18,22 +19,24 @@ type FieldKey = keyof typeof SLIDER_LIMITS;
 interface BenchmarkSliderProps {
   field: FieldKey;
   label: string;
-  helper?: string;
   value: number;
   unit?: string;
   formatValue?: (n: number) => string;
   onValueChange: (value: number) => void;
-  /** Extra content rendered below the status row (e.g. ChannelMix). */
   footerSlot?: ReactNode;
 }
 
 const STATUS_LABEL: Record<BenchmarkStatus, string> = {
-  poor: "Poor",
+  poor: "Low",
   average: "Average",
-  healthy: "Healthy",
-  benchmark: "Benchmark",
+  good: "Good",
 };
 
+/**
+ * Status uses red / amber / green only. Brand purple is reserved for
+ * interactive surfaces (slider track, active strategy cards) and never
+ * doubles as a status colour.
+ */
 const STATUS_STYLES: Record<
   BenchmarkStatus,
   { dot: string; text: string; bg: string; ring: string }
@@ -50,13 +53,7 @@ const STATUS_STYLES: Record<
     bg: "bg-warning/10",
     ring: "ring-warning/20",
   },
-  healthy: {
-    dot: "bg-brand-primary",
-    text: "text-brand-primary",
-    bg: "bg-brand-primary/10",
-    ring: "ring-brand-primary/20",
-  },
-  benchmark: {
+  good: {
     dot: "bg-success",
     text: "text-success",
     bg: "bg-success/10",
@@ -65,16 +62,14 @@ const STATUS_STYLES: Record<
 };
 
 /**
- * Refined slider card with anchor labels at the slider extremities, a
- * larger gradient track via the upgraded Slider primitive, a help icon
- * popover for educational context, and a richer status pill below the
- * track. Supports an optional footerSlot for slider-specific guidance
- * (e.g. the channel mix on meeting booked rate).
+ * Compact slider card. Snappy step values (5 for percentages, 0.5 for
+ * reply rate), anchor labels at the slider extremities, a help icon
+ * popover, a status pill, and a one-sentence contextual feedback message
+ * specific to outbound programs.
  */
 export function BenchmarkSlider({
   field,
   label,
-  helper,
   value,
   unit,
   formatValue,
@@ -87,6 +82,7 @@ export function BenchmarkSlider({
   const status = statusFor(field, value);
   const styles = STATUS_STYLES[status];
   const explainer = SLIDER_EXPLAINERS[field];
+  const context = STATUS_CONTEXT[field][status];
 
   const formatted = formatValue
     ? formatValue(value)
@@ -100,7 +96,7 @@ export function BenchmarkSlider({
     }));
 
   return (
-    <div className="group rounded-xl border border-border bg-card p-4 transition-all hover:border-brand-primary/30 hover:shadow-[0_8px_24px_-8px_hsl(var(--brand-primary)/0.15)]">
+    <div className="group rounded-xl border border-border bg-card p-3.5 transition-all hover:border-brand-primary/30 hover:shadow-[0_8px_24px_-8px_hsl(var(--brand-primary)/0.15)]">
       <div className="flex items-baseline justify-between gap-2">
         <div className="flex items-center gap-1.5">
           <label className="text-sm font-semibold text-foreground">{label}</label>
@@ -111,7 +107,7 @@ export function BenchmarkSlider({
         </span>
       </div>
 
-      <div className="relative mt-4 pb-3">
+      <div className="relative mt-3 pb-2">
         <Slider
           value={[value]}
           min={limits.min}
@@ -143,10 +139,10 @@ export function BenchmarkSlider({
         </span>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-2">
+      <div className="mt-2.5 flex items-center gap-2">
         <div
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1",
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1",
             styles.bg,
             styles.text,
             styles.ring
@@ -155,20 +151,13 @@ export function BenchmarkSlider({
           <span className={cn("h-1.5 w-1.5 rounded-full", styles.dot)} />
           {STATUS_LABEL[status]}
         </div>
-        {tickMarkers.length > 0 && (
-          <span className="truncate text-xs font-medium text-foreground/70">
-            {currentTickLabel(value, BENCHMARK_THRESHOLDS[field])}
-          </span>
-        )}
       </div>
 
-      {footerSlot && <div className="mt-3">{footerSlot}</div>}
+      <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+        {context}
+      </p>
 
-      {helper && (
-        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-          {helper}
-        </p>
-      )}
+      {footerSlot && <div className="mt-2.5">{footerSlot}</div>}
     </div>
   );
 }
@@ -217,15 +206,4 @@ function HelpIcon({ title, body }: HelpIconProps) {
 function formatDefault(value: number, step: number): string {
   if (step < 1) return value.toFixed(1);
   return Math.round(value).toLocaleString("en-US");
-}
-
-function currentTickLabel(
-  value: number,
-  thresholds: { tick?: string; threshold: number }[]
-): string {
-  let label = "";
-  for (const t of thresholds) {
-    if (value >= t.threshold && t.tick) label = t.tick;
-  }
-  return label;
 }
