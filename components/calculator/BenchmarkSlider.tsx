@@ -24,6 +24,18 @@ interface BenchmarkSliderProps {
   formatValue?: (n: number) => string;
   onValueChange: (value: number) => void;
   footerSlot?: ReactNode;
+  /**
+   * When false, hides every status-related element (tick markers,
+   * anchor labels, status pill, contextual feedback). Use for sliders
+   * where benchmarks are industry-dependent and the calculator should
+   * not imply a universal "good vs bad". The helper prop becomes the
+   * sole descriptive text.
+   */
+  showStatus?: boolean;
+  /**
+   * Plain helper text shown below the slider when showStatus is false.
+   */
+  helper?: string;
 }
 
 const STATUS_LABEL: Record<BenchmarkStatus, string> = {
@@ -32,11 +44,6 @@ const STATUS_LABEL: Record<BenchmarkStatus, string> = {
   good: "Good",
 };
 
-/**
- * Status uses red / amber / green only. Brand purple is reserved for
- * interactive surfaces (slider track, active strategy cards) and never
- * doubles as a status colour.
- */
 const STATUS_STYLES: Record<
   BenchmarkStatus,
   { dot: string; text: string; bg: string; ring: string }
@@ -62,10 +69,11 @@ const STATUS_STYLES: Record<
 };
 
 /**
- * Compact slider card. Snappy step values (5 for percentages, 0.5 for
- * reply rate), anchor labels at the slider extremities, a help icon
- * popover, a status pill, and a one-sentence contextual feedback message
- * specific to outbound programs.
+ * Compact slider card. When showStatus is true (default) renders the
+ * full benchmark UI: tick markers on the track, anchor labels, status
+ * pill, contextual feedback. When false renders only the slider plus a
+ * plain helper, for fields like close rate that vary too much by
+ * industry to give universal benchmarks.
  */
 export function BenchmarkSlider({
   field,
@@ -75,25 +83,30 @@ export function BenchmarkSlider({
   formatValue,
   onValueChange,
   footerSlot,
+  showStatus = true,
+  helper,
 }: BenchmarkSliderProps) {
   const limits = SLIDER_LIMITS[field];
   const thresholds = BENCHMARK_THRESHOLDS[field];
   const anchors = SLIDER_ANCHORS[field];
-  const status = statusFor(field, value);
-  const styles = STATUS_STYLES[status];
   const explainer = SLIDER_EXPLAINERS[field];
-  const context = STATUS_CONTEXT[field][status];
+
+  const status = showStatus ? statusFor(field, value) : null;
+  const styles = status ? STATUS_STYLES[status] : null;
+  const context = status ? STATUS_CONTEXT[field][status] : null;
 
   const formatted = formatValue
     ? formatValue(value)
     : `${formatDefault(value, limits.step)}${unit ?? ""}`;
 
-  const tickMarkers = thresholds
-    .filter((t) => t.threshold > limits.min && t.tick)
-    .map((t) => ({
-      tick: t.tick!,
-      percent: ((t.threshold - limits.min) / (limits.max - limits.min)) * 100,
-    }));
+  const tickMarkers = showStatus
+    ? thresholds
+        .filter((t) => t.threshold > limits.min && t.tick)
+        .map((t) => ({
+          tick: t.tick!,
+          percent: ((t.threshold - limits.min) / (limits.max - limits.min)) * 100,
+        }))
+    : [];
 
   return (
     <div className="group rounded-xl border border-border bg-card p-3.5 transition-all hover:border-brand-primary/30 hover:shadow-[0_8px_24px_-8px_hsl(var(--brand-primary)/0.15)]">
@@ -132,30 +145,46 @@ export function BenchmarkSlider({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
-        <span className="truncate uppercase tracking-[0.08em]">{anchors.left}</span>
-        <span className="truncate text-right uppercase tracking-[0.08em]">
-          {anchors.right}
-        </span>
-      </div>
+      {showStatus && (
+        <>
+          <div className="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+            <span className="truncate uppercase tracking-[0.08em]">
+              {anchors.left}
+            </span>
+            <span className="truncate text-right uppercase tracking-[0.08em]">
+              {anchors.right}
+            </span>
+          </div>
 
-      <div className="mt-2.5 flex items-center gap-2">
-        <div
-          className={cn(
-            "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1",
-            styles.bg,
-            styles.text,
-            styles.ring
+          {status && styles && (
+            <div className="mt-2.5 flex items-center gap-2">
+              <div
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1",
+                  styles.bg,
+                  styles.text,
+                  styles.ring
+                )}
+              >
+                <span className={cn("h-1.5 w-1.5 rounded-full", styles.dot)} />
+                {STATUS_LABEL[status]}
+              </div>
+            </div>
           )}
-        >
-          <span className={cn("h-1.5 w-1.5 rounded-full", styles.dot)} />
-          {STATUS_LABEL[status]}
-        </div>
-      </div>
 
-      <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
-        {context}
-      </p>
+          {context && (
+            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+              {context}
+            </p>
+          )}
+        </>
+      )}
+
+      {!showStatus && helper && (
+        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+          {helper}
+        </p>
+      )}
 
       {footerSlot && <div className="mt-2.5">{footerSlot}</div>}
     </div>

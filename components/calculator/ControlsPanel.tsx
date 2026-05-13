@@ -85,6 +85,8 @@ export function ControlsPanel({
             value={inputs.closeRate}
             unit="%"
             onValueChange={(v) => onChange("closeRate", v)}
+            showStatus={false}
+            helper="Close rate varies significantly by industry and sales motion. Sales-led B2B SaaS typically lands between 15 and 25 percent; self service can run higher or lower depending on product trial dynamics."
           />
         </div>
       </Section>
