@@ -3,16 +3,13 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { calculateRoi } from "@/lib/calculations";
-import {
-  DEFAULT_INPUTS,
-  LEADS_BY_SEQUENCE,
-} from "@/lib/defaults";
+import { DEFAULT_INPUTS, LEADS_BY_SEQUENCE } from "@/lib/defaults";
 import type { CalculatorInputs, SequenceSteps } from "@/lib/types";
 import { readInputsFromUrl, writeInputsToUrl } from "@/lib/url-state";
 import { ControlsPanel } from "@/components/calculator/ControlsPanel";
 import { FunnelViz } from "@/components/calculator/FunnelViz";
+import { MetricsPanel } from "@/components/calculator/MetricsPanel";
 import { PdfCaptureForm } from "@/components/calculator/PdfCaptureForm";
-import { RevenueHero } from "@/components/calculator/RevenueHero";
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
@@ -40,9 +37,6 @@ export default function Home() {
   }
 
   function setStrategy(steps: SequenceSteps) {
-    // When the visitor picks a new sequence strategy, snap leadsReached to
-    // the natural value for that strategy. They can still drag the leads
-    // slider afterward to override.
     setInputs((prev) => ({
       ...prev,
       sequenceSteps: steps,
@@ -57,11 +51,11 @@ export default function Home() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% -20%, hsl(var(--brand-primary) / 0.05), transparent 60%)",
+            "radial-gradient(ellipse 80% 50% at 50% -10%, hsl(var(--brand-primary) / 0.06), transparent 55%)",
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-14 md:py-18">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 md:py-10">
         {/* Header */}
         <header className="flex items-center justify-between">
           <a
@@ -75,75 +69,67 @@ export default function Home() {
               width={1400}
               height={300}
               priority
-              className="h-8 w-auto sm:h-9"
+              className="h-7 w-auto sm:h-8"
             />
           </a>
-          <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+          <span className="rounded-full border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
             ROI Calculator
           </span>
         </header>
 
-        {/* Hero */}
-        <section className="mt-14 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Outbound GTM impact
-          </p>
-          <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl md:text-5xl">
-            See the revenue your outbound program can generate.
+        {/* Brief title */}
+        <section className="mt-6 space-y-2">
+          <h1 className="text-balance text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl">
+            Outbound GTM revenue calculator
           </h1>
-          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Pick a sequence strategy, tune the performance, set your average
-            deal value. Every change updates the funnel and the projected
-            revenue immediately.
+          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Pick a sequence strategy, tune the performance, set your deal value.
+            Tap the help icons to learn what each metric means and what good
+            looks like.
           </p>
         </section>
 
-        {/* Headline result */}
-        <section className="mt-12">
-          <RevenueHero
-            revenuePerYear={outputs.revenuePerYear}
-            revenuePerMonth={outputs.revenuePerMonth}
-            deals={outputs.deals}
-            contactsReached={outputs.contactsReached}
+        {/* Controls at the top, full width */}
+        <section className="mt-6">
+          <ControlsPanel
+            inputs={inputs}
+            onChange={setInput}
+            onStrategyChange={setStrategy}
           />
         </section>
 
-        {/* Controls + funnel viz */}
-        <section className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-12">
-          <div className="order-1">
-            <ControlsPanel
-              inputs={inputs}
-              onChange={setInput}
-              onStrategyChange={setStrategy}
-            />
-          </div>
-          <div className="order-2 lg:sticky lg:top-8 lg:self-start">
-            <FunnelViz
-              contactsReached={outputs.contactsReached}
-              opens={outputs.opens}
-              replies={outputs.replies}
-              positiveReplies={outputs.positiveReplies}
-              meetings={outputs.meetings}
-              deals={outputs.deals}
-              rates={{
-                open: inputs.openRate,
-                reply: inputs.replyRate,
-                positive: inputs.positiveReplyRate,
-                meeting: inputs.meetingBookedRate,
-                close: inputs.closeRate,
-              }}
-            />
-          </div>
+        {/* Results: funnel left, metrics right */}
+        <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <FunnelViz
+            contactsReached={outputs.contactsReached}
+            opens={outputs.opens}
+            replies={outputs.replies}
+            positiveReplies={outputs.positiveReplies}
+            meetings={outputs.meetings}
+            deals={outputs.deals}
+            rates={{
+              open: inputs.openRate,
+              reply: inputs.replyRate,
+              positive: inputs.positiveReplyRate,
+              meeting: inputs.meetingBookedRate,
+              close: inputs.closeRate,
+            }}
+          />
+          <MetricsPanel
+            revenuePerYear={outputs.revenuePerYear}
+            revenuePerMonth={outputs.revenuePerMonth}
+            dealsPerMonth={outputs.deals}
+          />
         </section>
 
         {/* PDF capture */}
-        <section className="mt-20">
+        <section className="mt-8">
           <PdfCaptureForm />
         </section>
 
         {/* Footer */}
-        <footer className="mt-16 border-t border-border pt-8">
-          <div className="flex flex-col items-start justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
+        <footer className="mt-10 border-t border-border pt-5">
+          <div className="flex flex-col items-start justify-between gap-3 text-[11px] text-muted-foreground sm:flex-row">
             <p>Built by Omnivate AI</p>
             <div className="flex items-center gap-4">
               <a

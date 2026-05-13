@@ -154,3 +154,42 @@ export function statusFor(
   }
   return current;
 }
+
+/**
+ * Plain-English explainer content shown in the popover when a visitor taps
+ * the help icon next to a slider label. Keeps the helper text short and
+ * lets curious visitors dig deeper without crowding the surface UI.
+ */
+export const SLIDER_EXPLAINERS: Record<
+  keyof typeof SLIDER_LIMITS,
+  { title: string; body: string }
+> = {
+  leadsReached: {
+    title: "Unique leads reached",
+    body: "How many distinct prospects your outbound campaign touches each month. Higher reach means more pipeline at the top of the funnel; lower reach means deeper personalisation per lead. Capacity caps at 24,000 emails per month, so reach trades off with sequence length.",
+  },
+  openRate: {
+    title: "Open rate",
+    body: "Percent of contacted leads who open at least one email in the sequence. Strong open rates depend on warm domains, clean lists, and compelling subject lines. Industry healthy range is 50 to 75 percent; below 30 percent usually signals a deliverability problem.",
+  },
+  replyRate: {
+    title: "Reply rate",
+    body: "Percent of contacted leads who reply at all (positive or negative). Cold email rarely exceeds five percent reply rate; healthy programs typically sit between two and four percent. Lift comes from better targeting, sharper offers, and well written follow ups.",
+  },
+  positiveReplyRate: {
+    title: "Positive reply rate",
+    body: "Of the people who reply, what share express genuine interest rather than asking to be removed, saying wrong person, or sending a polite no. Healthy positive reply rate is 25 to 35 percent. Below 15 percent suggests your offer or audience targeting is off.",
+  },
+  meetingBookedRate: {
+    title: "Meeting booked rate",
+    body: "Of the positive replies, what share convert to a confirmed meeting on the calendar. This is the metric most affected by follow up motion. Email only follow up typically lands around 25 percent. Adding LinkedIn brings it to 50. Layering in cold calling pushes it past 75.",
+  },
+  closeRate: {
+    title: "Close rate",
+    body: "Of the meetings booked, what share become signed deals. Driven by your sales motion, offer fit, and pipeline rigour. Sales led B2B SaaS sits between 15 and 25 percent. Self service product led motions can land higher because the product can be tried before the buyer commits.",
+  },
+  dealValue: {
+    title: "Average deal value",
+    body: "Revenue from one closed deal. Use the average for one time deals, or annualised contract value for subscription products. The calculator multiplies this by deals per month to project revenue.",
+  },
+};

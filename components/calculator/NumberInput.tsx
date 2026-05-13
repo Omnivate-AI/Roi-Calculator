@@ -15,8 +15,8 @@ interface NumberInputProps {
 }
 
 /**
- * Numeric input with optional currency prefix and clamping. Used for deal
- * value and any other free-form number the visitor enters.
+ * Numeric input with optional currency prefix and clamping. Compact V3
+ * styling to match the new card density.
  */
 export function NumberInput({
   label,
@@ -49,11 +49,14 @@ export function NumberInput({
             if (Number.isNaN(next)) return;
             onValueChange(clamp(next, min, max));
           }}
-          className={cn("font-mono tabular-nums", prefix && "pl-7")}
+          className={cn(
+            "h-9 font-mono text-sm tabular-nums",
+            prefix && "pl-7"
+          )}
         />
       </div>
       {helper && (
-        <p className="text-xs leading-relaxed text-muted-foreground">{helper}</p>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">{helper}</p>
       )}
     </div>
   );
