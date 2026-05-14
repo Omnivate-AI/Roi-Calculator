@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { HelpCircle, Mail } from "lucide-react";
-import { LEADS_BY_SEQUENCE, STRATEGY_BY_SEQUENCE } from "@/lib/defaults";
 import type { SequenceSteps } from "@/lib/types";
 import { cn, formatInteger } from "@/lib/utils";
+import { useCalculatorConfig } from "./CalculatorConfigContext";
 
 interface StrategyToggleProps {
   value: SequenceSteps;
@@ -12,14 +12,12 @@ interface StrategyToggleProps {
 }
 
 /**
- * Single input box containing a three-segment selector for the sequence
- * strategy. Each segment labels itself "N emails per contact" so a first
- * time visitor immediately understands what the control affects. Beneath
- * each segment label sit the TAM framing and the resulting lead count so
- * the visitor sees the consequence of their choice without having to look
- * at the funnel.
+ * Strategy box. Step counts (1/2/3) and the matching TAM + lead-count
+ * labels are pulled from runtime config so admin can rename them in
+ * the future (e.g. "Wide", "Balanced", "Narrow") without a redeploy.
  */
 export function StrategyToggle({ value, onValueChange }: StrategyToggleProps) {
+  const config = useCalculatorConfig();
   const options: SequenceSteps[] = [1, 2, 3];
 
   return (
@@ -41,8 +39,8 @@ export function StrategyToggle({ value, onValueChange }: StrategyToggleProps) {
 
       <div className="mt-3 grid grid-cols-3 gap-1.5 rounded-lg border border-border bg-muted/30 p-1">
         {options.map((option) => {
-          const strategy = STRATEGY_BY_SEQUENCE[option];
-          const leads = LEADS_BY_SEQUENCE[option];
+          const strategy = config.strategyBySequence[option];
+          const leads = config.leadsBySequence[option];
           const active = option === value;
           return (
             <button
@@ -107,7 +105,7 @@ export function StrategyToggle({ value, onValueChange }: StrategyToggleProps) {
       <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground">
         Each contact receives {value} email{value > 1 ? "s" : ""}. Reaches{" "}
         <span className="font-semibold text-foreground">
-          {formatInteger(LEADS_BY_SEQUENCE[value])}
+          {formatInteger(config.leadsBySequence[value])}
         </span>{" "}
         unique leads per month at full capacity.
       </p>

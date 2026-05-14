@@ -1,39 +1,42 @@
+"use client";
+
 import { Mail, Briefcase, Phone, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCalculatorConfig } from "./CalculatorConfigContext";
 
 interface ChannelMixProps {
   meetingBookedRate: number;
 }
 
-interface Channel {
-  key: "email" | "linkedin" | "phone";
-  label: string;
-  Icon: typeof Mail;
-  threshold: number;
-}
-
-// Thresholds aligned to the new 0-50 range:
-//   Below 25% = email only
-//   25% to 40% = email + LinkedIn
-//   40%+ = email + LinkedIn + cold calling
-const CHANNELS: Channel[] = [
-  { key: "email", label: "Email", Icon: Mail, threshold: 0 },
-  { key: "linkedin", label: "LinkedIn", Icon: Briefcase, threshold: 25 },
-  { key: "phone", label: "Cold calling", Icon: Phone, threshold: 40 },
-];
-
 /**
- * Visual channel mix: three pills connected by short lines that light up
- * as the meeting booked rate crosses each threshold. Plus a contextual
- * nudge for what to add next.
+ * Visual channel mix. Thresholds for when LinkedIn and Cold calling
+ * "light up" come from runtime config (Supabase). Tweak the thresholds
+ * in /admin to shift when each channel pill activates.
  */
 export function ChannelMix({ meetingBookedRate }: ChannelMixProps) {
-  const next = CHANNELS.find((c) => meetingBookedRate < c.threshold);
+  const config = useCalculatorConfig();
+  const channels = [
+    { key: "email", label: "Email", Icon: Mail, threshold: 0 },
+    {
+      key: "linkedin",
+      label: "LinkedIn",
+      Icon: Briefcase,
+      threshold: config.channelMixThresholds.linkedin,
+    },
+    {
+      key: "phone",
+      label: "Cold calling",
+      Icon: Phone,
+      threshold: config.channelMixThresholds.phone,
+    },
+  ];
+
+  const next = channels.find((c) => meetingBookedRate < c.threshold);
 
   return (
     <div className="space-y-2 rounded-lg border border-border/60 bg-muted/40 p-2.5">
       <div className="flex items-center gap-1.5">
-        {CHANNELS.map((channel, index) => {
+        {channels.map((channel, index) => {
           const active = meetingBookedRate >= channel.threshold;
           return (
             <div key={channel.key} className="flex items-center gap-1.5">
@@ -49,12 +52,12 @@ export function ChannelMix({ meetingBookedRate }: ChannelMixProps) {
                 <span>{channel.label}</span>
                 {active && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
               </div>
-              {index < CHANNELS.length - 1 && (
+              {index < channels.length - 1 && (
                 <span
                   aria-hidden
                   className={cn(
                     "h-px w-2 transition-colors",
-                    meetingBookedRate >= CHANNELS[index + 1].threshold
+                    meetingBookedRate >= channels[index + 1].threshold
                       ? "bg-brand-primary/40"
                       : "bg-border"
                   )}

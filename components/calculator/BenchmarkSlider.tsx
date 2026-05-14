@@ -3,18 +3,17 @@
 import { useState, type ReactNode } from "react";
 import { HelpCircle } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import {
-  BENCHMARK_THRESHOLDS,
-  SLIDER_ANCHORS,
-  SLIDER_EXPLAINERS,
-  SLIDER_LIMITS,
-  STATUS_CONTEXT,
-  statusFor,
-} from "@/lib/defaults";
 import type { BenchmarkStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useCalculatorConfig } from "./CalculatorConfigContext";
 
-type FieldKey = keyof typeof SLIDER_LIMITS;
+type FieldKey =
+  | "openRate"
+  | "replyRate"
+  | "positiveReplyRate"
+  | "meetingBookedRate"
+  | "closeRate"
+  | "dealValue";
 
 interface BenchmarkSliderProps {
   field: FieldKey;
@@ -24,17 +23,7 @@ interface BenchmarkSliderProps {
   formatValue?: (n: number) => string;
   onValueChange: (value: number) => void;
   footerSlot?: ReactNode;
-  /**
-   * When false, hides every status-related element (tick markers,
-   * anchor labels, status pill, contextual feedback). Use for sliders
-   * where benchmarks are industry-dependent and the calculator should
-   * not imply a universal "good vs bad". The helper prop becomes the
-   * sole descriptive text.
-   */
   showStatus?: boolean;
-  /**
-   * Plain helper text shown below the slider when showStatus is false.
-   */
   helper?: string;
 }
 
@@ -68,12 +57,21 @@ const STATUS_STYLES: Record<
   },
 };
 
+function statusFor(
+  thresholds: { status: BenchmarkStatus; threshold: number }[],
+  value: number
+): BenchmarkStatus {
+  let current: BenchmarkStatus = "poor";
+  for (const entry of thresholds) {
+    if (value >= entry.threshold) current = entry.status;
+  }
+  return current;
+}
+
 /**
- * Compact slider card. When showStatus is true (default) renders the
- * full benchmark UI: tick markers on the track, anchor labels, status
- * pill, contextual feedback. When false renders only the slider plus a
- * plain helper, for fields like close rate that vary too much by
- * industry to give universal benchmarks.
+ * Reads everything from the runtime calculator config (Supabase-backed,
+ * editable via /admin) — slider limits, thresholds, anchor labels,
+ * explainer copy, status feedback all come from context.
  */
 export function BenchmarkSlider({
   field,
@@ -86,14 +84,15 @@ export function BenchmarkSlider({
   showStatus = true,
   helper,
 }: BenchmarkSliderProps) {
-  const limits = SLIDER_LIMITS[field];
-  const thresholds = BENCHMARK_THRESHOLDS[field];
-  const anchors = SLIDER_ANCHORS[field];
-  const explainer = SLIDER_EXPLAINERS[field];
+  const config = useCalculatorConfig();
+  const limits = config.sliderLimits[field];
+  const thresholds = config.benchmarkThresholds[field];
+  const anchors = config.sliderAnchors[field];
+  const explainer = config.sliderExplainers[field];
 
-  const status = showStatus ? statusFor(field, value) : null;
+  const status = showStatus ? statusFor(thresholds, value) : null;
   const styles = status ? STATUS_STYLES[status] : null;
-  const context = status ? STATUS_CONTEXT[field][status] : null;
+  const context = status ? config.statusContext[field][status] : null;
 
   const formatted = formatValue
     ? formatValue(value)

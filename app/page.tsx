@@ -1,48 +1,15 @@
-"use client";
-
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { calculateRoi } from "@/lib/calculations";
-import { DEFAULT_INPUTS, LEADS_BY_SEQUENCE } from "@/lib/defaults";
-import type { CalculatorInputs, SequenceSteps } from "@/lib/types";
-import { readInputsFromUrl, writeInputsToUrl } from "@/lib/url-state";
-import { ControlsPanel } from "@/components/calculator/ControlsPanel";
-import { FunnelViz } from "@/components/calculator/FunnelViz";
-import { MetricsPanel } from "@/components/calculator/MetricsPanel";
-import { PdfCaptureForm } from "@/components/calculator/PdfCaptureForm";
+import { getCalculatorConfig } from "@/lib/config-loader";
+import { Calculator } from "@/components/calculator/Calculator";
 
-export default function Home() {
-  const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
-  const hasHydratedRef = useRef(false);
-
-  useEffect(() => {
-    if (hasHydratedRef.current) return;
-    hasHydratedRef.current = true;
-    const fromUrl = readInputsFromUrl();
-    if (fromUrl !== DEFAULT_INPUTS) setInputs(fromUrl);
-  }, []);
-
-  useEffect(() => {
-    if (!hasHydratedRef.current) return;
-    writeInputsToUrl(inputs);
-  }, [inputs]);
-
-  const outputs = useMemo(() => calculateRoi(inputs), [inputs]);
-
-  function setInput<K extends keyof CalculatorInputs>(
-    key: K,
-    value: CalculatorInputs[K]
-  ) {
-    setInputs((prev) => ({ ...prev, [key]: value }));
-  }
-
-  function setStrategy(steps: SequenceSteps) {
-    setInputs((prev) => ({
-      ...prev,
-      sequenceSteps: steps,
-      leadsReached: LEADS_BY_SEQUENCE[steps],
-    }));
-  }
+/**
+ * Server-rendered calculator page. Pulls the editable config from
+ * Supabase (cached for 60 seconds, falls back to lib/defaults if
+ * Supabase is unreachable) and hands it to the client Calculator
+ * component as a prop.
+ */
+export default async function Home() {
+  const config = await getCalculatorConfig();
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground">
@@ -92,7 +59,7 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Title only — metrics live at the bottom of the input column now */}
+        {/* Title */}
         <section className="mt-5 space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary">
             Run the numbers
@@ -107,48 +74,8 @@ export default function Home() {
           </p>
         </section>
 
-        {/* Main two-column layout: inputs left, funnel right (sticky on desktop) */}
-        <section className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-          <div className="space-y-2.5">
-            <ControlsPanel
-              inputs={inputs}
-              onChange={setInput}
-              onStrategyChange={setStrategy}
-            />
-            {/* Metric cards at the bottom of the input column */}
-            <div className="pt-1.5">
-              <MetricsPanel
-                revenuePerMonth={outputs.revenuePerMonth}
-                dealsPerMonth={outputs.deals}
-              />
-            </div>
-          </div>
-
-          <div className="lg:sticky lg:top-4 lg:self-start">
-            <FunnelViz
-              emailsSent={outputs.emailsSentPerMonth}
-              sequenceSteps={inputs.sequenceSteps}
-              contactsReached={outputs.contactsReached}
-              opens={outputs.opens}
-              replies={outputs.replies}
-              positiveReplies={outputs.positiveReplies}
-              meetings={outputs.meetings}
-              deals={outputs.deals}
-              rates={{
-                open: inputs.openRate,
-                reply: inputs.replyRate,
-                positive: inputs.positiveReplyRate,
-                meeting: inputs.meetingBookedRate,
-                close: inputs.closeRate,
-              }}
-            />
-          </div>
-        </section>
-
-        {/* PDF capture */}
-        <section className="mt-6">
-          <PdfCaptureForm />
-        </section>
+        {/* Interactive calculator (client) */}
+        <Calculator config={config} />
 
         {/* Footer */}
         <footer className="mt-6 border-t border-border pt-4">
