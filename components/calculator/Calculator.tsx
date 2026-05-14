@@ -63,13 +63,17 @@ export function Calculator({ config }: CalculatorProps) {
   return (
     <CalculatorConfigProvider value={config}>
       <section className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        <div className="space-y-2.5">
-          <ControlsPanel
-            inputs={inputs}
-            onChange={setInput}
-            onStrategyChange={setStrategy}
-          />
-          <div className="pt-1.5">
+        {/* Left column: scrollable inputs with metrics pinned at the bottom */}
+        <div className="flex flex-col lg:h-[calc(100vh-220px)] lg:min-h-[600px]">
+          <div className="space-y-2.5 lg:flex-1 lg:overflow-y-auto lg:pr-2 lg:[scrollbar-width:thin]">
+            <ControlsPanel
+              inputs={inputs}
+              onChange={setInput}
+              onStrategyChange={setStrategy}
+            />
+          </div>
+          {/* Sticky metrics at the bottom of the left column */}
+          <div className="mt-2.5 shrink-0 lg:border-t lg:border-border lg:pt-2.5">
             <MetricsPanel
               revenuePerMonth={outputs.revenuePerMonth}
               dealsPerMonth={outputs.deals}
@@ -77,7 +81,8 @@ export function Calculator({ config }: CalculatorProps) {
           </div>
         </div>
 
-        <div className="lg:sticky lg:top-4 lg:self-start">
+        {/* Right column: funnel viz, fixed (no scroll) */}
+        <div className="lg:h-[calc(100vh-220px)] lg:min-h-[600px] lg:sticky lg:top-4 lg:self-start">
           <FunnelViz
             emailsSent={outputs.emailsSentPerMonth}
             sequenceSteps={inputs.sequenceSteps}

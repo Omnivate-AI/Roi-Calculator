@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { HelpCircle, Mail } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 import type { SequenceSteps } from "@/lib/types";
 import { cn, formatInteger } from "@/lib/utils";
 import { useCalculatorConfig } from "./CalculatorConfigContext";
@@ -12,13 +13,41 @@ interface StrategyToggleProps {
 }
 
 /**
- * Strategy box. Step counts (1/2/3) and the matching TAM + lead-count
- * labels are pulled from runtime config so admin can rename them in
- * the future (e.g. "Wide", "Balanced", "Narrow") without a redeploy.
+ * Sequence strategy as a horizontal slider with three landmarks. The
+ * slider tracks 0 to 30,000 (leads reached) with step=1 for smooth
+ * thumb movement, but snaps to one of the three natural positions
+ * (24k → 1 email, 12k → 2 emails, 8k → 3 emails) on every value
+ * change. Visually labelled tick marks under the track make the three
+ * choices unambiguous.
  */
 export function StrategyToggle({ value, onValueChange }: StrategyToggleProps) {
   const config = useCalculatorConfig();
-  const options: SequenceSteps[] = [1, 2, 3];
+  const options: SequenceSteps[] = [3, 2, 1]; // left to right on the track: small to large TAM
+
+  const landmarks = options.map((steps) => ({
+    steps,
+    leads: config.leadsBySequence[steps],
+    strategy: config.strategyBySequence[steps],
+  }));
+
+  const currentLeads = config.leadsBySequence[value];
+  const sliderMin = 0;
+  const sliderMax = 30_000;
+
+  /**
+   * Snap to nearest landmark on every value change so the leads count
+   * always corresponds to a real sequence step count.
+   */
+  function handleSliderChange(values: number[]) {
+    const next = values[0];
+    let best = landmarks[0];
+    for (const landmark of landmarks) {
+      if (Math.abs(landmark.leads - next) < Math.abs(best.leads - next)) {
+        best = landmark;
+      }
+    }
+    if (best.steps !== value) onValueChange(best.steps);
+  }
 
   return (
     <div className="group rounded-xl border border-border bg-card p-3.5 transition-all hover:border-brand-primary/30 hover:shadow-[0_8px_24px_-8px_hsl(var(--brand-primary)/0.15)]">
@@ -37,78 +66,94 @@ export function StrategyToggle({ value, onValueChange }: StrategyToggleProps) {
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-1.5 rounded-lg border border-border bg-muted/30 p-1">
-        {options.map((option) => {
-          const strategy = config.strategyBySequence[option];
-          const leads = config.leadsBySequence[option];
-          const active = option === value;
+      <div className="relative mt-3 pb-2">
+        <Slider
+          value={[currentLeads]}
+          min={sliderMin}
+          max={sliderMax}
+          step={1}
+          onValueChange={handleSliderChange}
+          className="cursor-pointer"
+        />
+        {/* Tick markers at the three landmark positions */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-2 h-1"
+        >
+          {landmarks.map((lm) => {
+            const percent = ((lm.leads - sliderMin) / (sliderMax - sliderMin)) * 100;
+            const active = lm.steps === value;
+            return (
+              <span
+                key={lm.steps}
+                className={cn(
+                  "absolute h-2 w-px -translate-x-1/2 rounded-full transition-colors",
+                  active ? "bg-brand-primary" : "bg-foreground/30"
+                )}
+                style={{ left: `${percent}%` }}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Landmark labels under the track */}
+      <div className="relative h-12">
+        {landmarks.map((lm) => {
+          const percent = ((lm.leads - sliderMin) / (sliderMax - sliderMin)) * 100;
+          const active = lm.steps === value;
           return (
             <button
-              key={option}
+              key={lm.steps}
               type="button"
-              onClick={() => onValueChange(option)}
+              onClick={() => onValueChange(lm.steps)}
               className={cn(
-                "flex flex-col items-center gap-0.5 rounded-md px-2 py-2 text-center transition-all",
-                active
-                  ? "shadow-[0_2px_6px_-2px_hsl(var(--brand-primary)/0.4)]"
-                  : "hover:bg-background/60"
+                "absolute top-0 -translate-x-1/2 cursor-pointer text-center transition-colors",
+                active ? "text-brand-primary" : "text-muted-foreground hover:text-foreground"
               )}
-              style={
-                active
-                  ? {
-                      background:
-                        "linear-gradient(135deg, hsl(var(--brand-primary)) 0%, hsl(var(--brand-secondary)) 100%)",
-                    }
-                  : undefined
-              }
+              style={{ left: `${percent}%` }}
             >
-              <Mail
-                className={cn(
-                  "h-3 w-3",
-                  active ? "text-primary-foreground" : "text-muted-foreground"
-                )}
-                strokeWidth={2.5}
-              />
               <span
                 className={cn(
-                  "text-[11px] font-semibold",
-                  active ? "text-primary-foreground" : "text-foreground"
+                  "block font-mono text-[10px] font-semibold tabular-nums",
+                  active && "text-brand-primary"
                 )}
               >
-                {option} email{option > 1 ? "s" : ""}
+                {formatInteger(lm.leads)}
               </span>
               <span
                 className={cn(
-                  "text-[9px] uppercase tracking-[0.1em]",
-                  active
-                    ? "text-primary-foreground/85"
-                    : "text-muted-foreground"
+                  "mt-0.5 block text-[9px] font-semibold uppercase tracking-[0.08em]",
+                  active && "text-brand-primary"
                 )}
               >
-                {strategy.tam}
+                {lm.steps} email{lm.steps > 1 ? "s" : ""}
               </span>
               <span
                 className={cn(
-                  "font-mono text-[10px] tabular-nums",
-                  active
-                    ? "text-primary-foreground/95"
-                    : "text-muted-foreground"
+                  "mt-0.5 block text-[8px] uppercase tracking-[0.1em]",
+                  active ? "text-brand-primary/80" : "text-muted-foreground/70"
                 )}
               >
-                {formatInteger(leads)} leads
+                {lm.strategy.tam}
               </span>
             </button>
           );
         })}
       </div>
 
-      <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground">
-        Each contact receives {value} email{value > 1 ? "s" : ""}. Reaches{" "}
-        <span className="font-semibold text-foreground">
-          {formatInteger(config.leadsBySequence[value])}
-        </span>{" "}
-        unique leads per month at full capacity.
-      </p>
+      <div className="mt-1 flex items-center gap-1.5 rounded-md bg-brand-primary/[0.04] px-2 py-1.5">
+        <Mail className="h-3 w-3 text-brand-primary" strokeWidth={2.5} />
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          Each contact receives{" "}
+          <span className="font-semibold text-foreground">{value}</span> email
+          {value > 1 ? "s" : ""}. Reaches{" "}
+          <span className="font-semibold text-foreground">
+            {formatInteger(currentLeads)}
+          </span>{" "}
+          unique leads per month at full capacity.
+        </p>
+      </div>
     </div>
   );
 }
