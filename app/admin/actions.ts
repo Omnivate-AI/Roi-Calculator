@@ -3,32 +3,27 @@
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminEmail } from "@/lib/admin-auth";
-import { createClient as createServerSupabase } from "@/lib/supabase/server";
+import { clearSession, isAdmin } from "@/lib/admin-auth";
 import type { CalculatorConfig } from "@/lib/config-types";
 
 /**
- * Save a new full config payload. Caller must already be authenticated
- * and in the admin allowlist; we re-verify server side here too.
- *
- * Writes the new payload to roi_calc.config and inserts an audit row
- * into roi_calc.config_changes capturing the previous and new payloads.
- * Then revalidates the calculator-config tag so the calculator picks up
- * the change within seconds.
+ * Save a new full config payload. Verifies the caller has a valid
+ * admin session cookie. Writes to roi_calc.config and inserts an
+ * audit row into roi_calc.config_changes. Revalidates the calculator
+ * config cache so changes are visible within ~60 seconds.
  */
 export async function saveConfig(newPayload: CalculatorConfig): Promise<{
   ok: boolean;
   error?: string;
 }> {
-  const email = await getAdminEmail();
-  if (!email) {
+  const allowed = await isAdmin();
+  if (!allowed) {
     return { ok: false, error: "Not authorized" };
   }
 
   try {
     const admin = createAdminClient();
 
-    // Fetch the previous payload for the audit log.
     const { data: existing } = await admin
       .schema("roi_calc")
       .from("config")
@@ -36,7 +31,6 @@ export async function saveConfig(newPayload: CalculatorConfig): Promise<{
       .eq("id", 1)
       .single();
 
-    // Upsert the new payload.
     const { error: upsertError } = await admin
       .schema("roi_calc")
       .from("config")
@@ -44,7 +38,7 @@ export async function saveConfig(newPayload: CalculatorConfig): Promise<{
         {
           id: 1,
           payload: newPayload,
-          updated_by: email,
+          updated_by: "admin",
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
@@ -54,15 +48,12 @@ export async function saveConfig(newPayload: CalculatorConfig): Promise<{
       return { ok: false, error: upsertError.message };
     }
 
-    // Log the change.
     await admin.schema("roi_calc").from("config_changes").insert({
-      changed_by: email,
+      changed_by: "admin",
       previous_payload: existing?.payload ?? null,
       new_payload: newPayload,
     });
 
-    // Invalidate the calculator config cache. Next.js 16 requires a
-    // profile string ("max" = revalidate everywhere immediately).
     revalidateTag("calculator-config", "max");
 
     return { ok: true };
@@ -75,10 +66,9 @@ export async function saveConfig(newPayload: CalculatorConfig): Promise<{
 }
 
 /**
- * Sign the admin user out and redirect to the login page.
+ * Clear the session cookie and redirect to the login page.
  */
 export async function signOut(): Promise<void> {
-  const supabase = await createServerSupabase();
-  await supabase.auth.signOut();
+  await clearSession();
   redirect("/admin/login");
 }

@@ -7,7 +7,6 @@ import type { CalculatorConfig } from "@/lib/config-types";
 
 interface AdminEditorProps {
   initialConfig: CalculatorConfig;
-  adminEmail: string;
 }
 
 /**
@@ -15,7 +14,7 @@ interface AdminEditorProps {
  * payload. Pragmatic V1 - one big JSON textarea so every field is
  * editable. We add structured field-by-field editors later if needed.
  */
-export function AdminEditor({ initialConfig, adminEmail }: AdminEditorProps) {
+export function AdminEditor({ initialConfig }: AdminEditorProps) {
   const [draft, setDraft] = useState(() => JSON.stringify(initialConfig, null, 2));
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -78,9 +77,6 @@ export function AdminEditor({ initialConfig, adminEmail }: AdminEditorProps) {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-muted-foreground sm:inline">
-              Signed in as <span className="font-mono">{adminEmail}</span>
-            </span>
             <Button
               type="button"
               variant="outline"
@@ -96,8 +92,8 @@ export function AdminEditor({ initialConfig, adminEmail }: AdminEditorProps) {
         <p className="mt-4 text-sm text-muted-foreground">
           Edit the JSON below to change calculator copy, thresholds, scales, and
           defaults. Save when ready. Changes appear on the live calculator
-          within 60 seconds (cache revalidation). Every save is logged with your
-          email and the previous payload, so any change can be reverted.
+          within 60 seconds (cache revalidation). Every save is logged with the
+          previous payload, so any change can be reverted.
         </p>
 
         {/* Action bar */}
