@@ -46,15 +46,14 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground">
-      {/* Background gradient mesh */}
+      {/* Subtle background gradients */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage: `
             radial-gradient(ellipse 60% 40% at 15% 0%, hsl(var(--brand-primary) / 0.08), transparent 55%),
-            radial-gradient(ellipse 50% 35% at 90% 10%, hsl(var(--brand-accent) / 0.06), transparent 55%),
-            radial-gradient(ellipse 40% 30% at 50% 100%, hsl(var(--brand-secondary) / 0.04), transparent 50%)
+            radial-gradient(ellipse 50% 35% at 90% 10%, hsl(var(--brand-accent) / 0.06), transparent 55%)
           `,
         }}
       />
@@ -68,7 +67,7 @@ export default function Home() {
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6 md:py-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
         {/* Header */}
         <header className="flex items-center justify-between">
           <a
@@ -93,55 +92,57 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Title + live metrics, side by side at top */}
-        <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end">
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary">
-              Run the numbers
-            </p>
-            <h1 className="text-balance text-2xl font-bold leading-[1.15] tracking-tight text-foreground sm:text-3xl">
-              See the revenue an outbound program can generate.
-            </h1>
-            <p className="max-w-xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
-              Pick a sequence strategy, tune the performance, set your average
-              deal value. Tap the help icons inside each card for plain English
-              explanations.
-            </p>
+        {/* Title only — metrics live at the bottom of the input column now */}
+        <section className="mt-5 space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary">
+            Run the numbers
+          </p>
+          <h1 className="text-balance text-2xl font-bold leading-[1.15] tracking-tight text-foreground sm:text-3xl">
+            See the revenue an outbound program can generate.
+          </h1>
+          <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            Tune each input on the left. The funnel and projected results
+            update live on the right. Tap the help icons inside any card for
+            plain English explanations.
+          </p>
+        </section>
+
+        {/* Main two-column layout: inputs left, funnel right (sticky on desktop) */}
+        <section className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+          <div className="space-y-2.5">
+            <ControlsPanel
+              inputs={inputs}
+              onChange={setInput}
+              onStrategyChange={setStrategy}
+            />
+            {/* Metric cards at the bottom of the input column */}
+            <div className="pt-1.5">
+              <MetricsPanel
+                revenuePerMonth={outputs.revenuePerMonth}
+                dealsPerMonth={outputs.deals}
+              />
+            </div>
           </div>
-          <MetricsPanel
-            revenuePerMonth={outputs.revenuePerMonth}
-            dealsPerMonth={outputs.deals}
-          />
-        </section>
 
-        {/* Controls take the bulk of the page */}
-        <section className="mt-6">
-          <ControlsPanel
-            inputs={inputs}
-            onChange={setInput}
-            onStrategyChange={setStrategy}
-          />
-        </section>
-
-        {/* Funnel viz below the fold for the curious */}
-        <section className="mt-5">
-          <FunnelViz
-            emailsSent={outputs.emailsSentPerMonth}
-            sequenceSteps={inputs.sequenceSteps}
-            contactsReached={outputs.contactsReached}
-            opens={outputs.opens}
-            replies={outputs.replies}
-            positiveReplies={outputs.positiveReplies}
-            meetings={outputs.meetings}
-            deals={outputs.deals}
-            rates={{
-              open: inputs.openRate,
-              reply: inputs.replyRate,
-              positive: inputs.positiveReplyRate,
-              meeting: inputs.meetingBookedRate,
-              close: inputs.closeRate,
-            }}
-          />
+          <div className="lg:sticky lg:top-4 lg:self-start">
+            <FunnelViz
+              emailsSent={outputs.emailsSentPerMonth}
+              sequenceSteps={inputs.sequenceSteps}
+              contactsReached={outputs.contactsReached}
+              opens={outputs.opens}
+              replies={outputs.replies}
+              positiveReplies={outputs.positiveReplies}
+              meetings={outputs.meetings}
+              deals={outputs.deals}
+              rates={{
+                open: inputs.openRate,
+                reply: inputs.replyRate,
+                positive: inputs.positiveReplyRate,
+                meeting: inputs.meetingBookedRate,
+                close: inputs.closeRate,
+              }}
+            />
+          </div>
         </section>
 
         {/* PDF capture */}
@@ -150,7 +151,7 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="mt-8 border-t border-border pt-4">
+        <footer className="mt-6 border-t border-border pt-4">
           <div className="flex flex-col items-start justify-between gap-3 text-[11px] text-muted-foreground sm:flex-row">
             <p>Built by Omnivate AI</p>
             <div className="flex items-center gap-4">
