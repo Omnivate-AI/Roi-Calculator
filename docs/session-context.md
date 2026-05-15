@@ -93,8 +93,9 @@ Same as `.env.local`. Set via `vercel env add NAME production`.
 |---|---|---|
 | `roi_calc.config` | 1 | Single editable row, JSONB `payload` column holding the entire calculator config. Calculator page reads this. Admin page writes to it. |
 | `roi_calc.config_changes` | grows on every save | Audit log. Columns: `id`, `changed_at`, `changed_by`, `previous_payload`, `new_payload`. |
-| `roi_calc.admins` | 1 | Originally seeded with `amzat@omnivate.ai` when we planned magic-link auth. **Unused** now since we switched to shared-password auth. Safe to drop. |
 | `roi_calc.leads` | grows on every PDF download | M5 lead capture. Columns: `id`, `email`, `name`, `company_name`, `inputs` JSONB, `outputs` JSONB, `ip_hash`, `user_agent`, `created_at`. `service_role` only; no public RLS policy. |
+
+*(`roi_calc.admins` was dropped 2026-05-15 after the move from magic-link auth to shared-password auth made it unused.)*
 
 ### RLS
 
@@ -152,7 +153,7 @@ C:\Users\HP\Roi-Calculator\
 │       ├── FunnelViz.tsx                 # 7-stage funnel (emails sent → ... → deals)
 │       ├── MetricsPanel.tsx              # Deals/month + Revenue/month
 │       ├── NumberInput.tsx               # $ prefix input
-│       ├── PdfCaptureForm.tsx            # Placeholder for M5
+│       ├── PdfCaptureForm.tsx            # Lead form → POST /api/send-pdf → inline download
 │       └── TweenedNumber.tsx             # rAF-based smooth number animation
 ├── lib/
 │   ├── calculations.ts                   # Pure ROI math (no React)
@@ -206,7 +207,7 @@ C:\Users\HP\Roi-Calculator\
     Deals/month + Revenue/month (revenue uses brand gradient)
   - **Right column** (sticky, no scroll):
     Funnel viz with 7 stages: emails sent → leads reached → opens → replies → positive → meetings → deals
-- **PDF capture form** (placeholder, M5 wires it)
+- **PDF capture form** — collects email + name + company, POSTs to `/api/send-pdf`, triggers inline browser download
 - **Footer** with privacy link to `omnivate.ai/privacy-policy`
 
 ### Each slider card
@@ -321,7 +322,7 @@ Status bands (3 only, simplified from earlier 4-band poor/avg/healthy/benchmark)
 | 2 | M2 Tooling setup | ✓ Shipped | `docs/m2-setup.md` |
 | 3 | M3 Requirements stack | ✓ Shipped (signed off by Omar) | `docs/m3-requirements-stack.md` |
 | 4 | M4 Build calculator | ✓ Shipped (V1 → V6 iterations) | `docs/m4-verification-scenarios.md` |
-| 5 | M5 PDF + Smartlead + persistence | **NOT STARTED** | — |
+| 5 | M5 PDF + lead persistence | ✓ Shipped (Smartlead deferred — see runbook) | `docs/launch-runbook.md` |
 
 ---
 
@@ -353,30 +354,23 @@ Status bands (3 only, simplified from earlier 4-band poor/avg/healthy/benchmark)
 
 ---
 
-## 11. M5 — outstanding work
+## 11. M5 — what shipped, what's deferred
 
-The only thing left before the project is fully signed off.
+M5 went live 2026-05-15. Inline browser download is the active delivery path; the planned Smartlead email send is deferred.
 
-### Scope
+### Shipped
 
-1. **Build `app/api/send-pdf/route.ts`** API route that receives the PDF form submission
-2. **PDF generation** — recommendation: `@react-pdf/renderer` (clean Vercel-friendly, no Puppeteer needed). Generate a one-page branded PDF summarizing the visitor's inputs and projected outputs.
-3. **Supabase lead persistence** — create new table `roi_calc.leads` (columns: id, email, name, company_name, inputs JSONB, outputs JSONB, created_at). Insert a row before pushing to Smartlead.
-4. **Smartlead delivery** — push lead into a transactional campaign that sends the PDF (or hosted PDF link) to the visitor's inbox.
-5. **Anti-abuse** — rate limit by IP, basic email format validation, reject obvious junk.
-6. **Update `components/calculator/PdfCaptureForm.tsx`** to actually call the API.
-7. **Write `docs/launch-runbook.md`** capturing: how to monitor submissions, how to access Smartlead campaign, how to rerun failed submissions.
+1. `POST /api/send-pdf` validates input, persists the lead row, renders a one-page branded PDF via `@react-pdf/renderer`, and streams the binary back
+2. `roi_calc.leads` table (RLS enabled, service-role grants in place) — captures email, name, company, full inputs JSONB, computed outputs JSONB, salted IP hash, user agent, timestamp
+3. `lib/rate-limit.ts` — in-memory 10 hits/hour/IP with HMAC-salted hash so raw IPs are never stored
+4. `lib/pdf.tsx` — branded one-pager built with `@react-pdf/renderer`
+5. `components/calculator/PdfCaptureForm.tsx` — POSTs current inputs, triggers download via blob URL
+6. `docs/launch-runbook.md` — daily ops, common failures, secret rotation, future Smartlead wiring
 
-### Blockers before starting
+### Deferred to a follow-up
 
-- Real `SMARTLEAD_API_KEY` from Omar (currently placeholder)
-- Real `SMARTLEAD_CAMPAIGN_ID` (Sheriff needs to create the transactional campaign in Smartlead, get the ID, set in Vercel env)
-- DNS for `roi.omnivate.ai` (deferred, not blocking)
-
-### Pre-M5 cleanup options
-
-- Drop `roi_calc.admins` table (unused since we switched to password auth)
-- Confirm Supabase Pro vs Hobby is fine for our usage levels
+- **Smartlead email delivery** — gated on Smartlead plan upgrade. Their Basic plan ($39/mo) does not include API access; Pro ($94/mo) is required. Full wiring instructions live in `docs/launch-runbook.md` under "Future work: hooking up Smartlead"
+- **DNS for `roi.omnivate.ai`** — still pending Omar
 
 ---
 

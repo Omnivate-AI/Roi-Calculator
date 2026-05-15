@@ -53,15 +53,6 @@ export function formatPercent(value: number, opts?: { decimals?: number }): stri
 }
 
 /**
- * Format an ROI multiple. Above 10×, no decimals. Below, one decimal.
- */
-export function formatMultiple(value: number): string {
-  if (!Number.isFinite(value) || value === 0) return "0×";
-  if (value >= 10) return `${Math.round(value)}×`;
-  return `${value.toFixed(1)}×`;
-}
-
-/**
  * Format a deal count with precision that scales with size. Big deal
  * values mean low deal counts are still meaningful (a $200k deal once
  * every four months is a real number, not a rounding error), so we keep
