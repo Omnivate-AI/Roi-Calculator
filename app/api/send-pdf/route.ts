@@ -96,56 +96,64 @@ export async function POST(req: Request) {
   // Upload PDF to Storage + push to Smartlead. Both are best-effort:
   // the visitor still gets the inline download even if either fails.
   // Failures are recorded on the lead row for later retry.
-  try {
-    const { storagePath, signedUrl } = await uploadPdfAndSign(
-      leadRow.id,
-      pdfBuffer
-    );
-    await supabase
-      .schema("roi_calc")
-      .from("leads")
-      .update({ pdf_storage_path: storagePath })
-      .eq("id", leadRow.id);
-
-    const { first, last } = splitName(validation.value.name);
+  //
+  // Gated on Smartlead env vars being set. When they're missing (paused
+  // state on production), we skip Storage upload + Smartlead push
+  // entirely — there's no signed URL to deliver, so the upload is
+  // unnecessary work. Lead row still saved, inline PDF still streams.
+  const smartleadEnabled = Boolean(
+    process.env.SMARTLEAD_API_KEY && process.env.SMARTLEAD_CAMPAIGN_ID
+  );
+  if (smartleadEnabled) {
     try {
-      await pushLeadToCampaign({
-        email: validation.value.email.toLowerCase().trim(),
-        firstName: first,
-        lastName: last,
-        companyName: validation.value.companyName,
-        customFields: { pdf_link: signedUrl },
-      });
+      const { storagePath, signedUrl } = await uploadPdfAndSign(
+        leadRow.id,
+        pdfBuffer
+      );
       await supabase
         .schema("roi_calc")
         .from("leads")
-        .update({ smartlead_pushed_at: new Date().toISOString() })
+        .update({ pdf_storage_path: storagePath })
         .eq("id", leadRow.id);
-    } catch (smartleadErr) {
-      console.error("[send-pdf] Smartlead push failed", smartleadErr);
+
+      const { first, last } = splitName(validation.value.name);
+      try {
+        await pushLeadToCampaign({
+          email: validation.value.email.toLowerCase().trim(),
+          firstName: first,
+          lastName: last,
+          companyName: validation.value.companyName,
+          customFields: { pdf_link: signedUrl },
+        });
+        await supabase
+          .schema("roi_calc")
+          .from("leads")
+          .update({ smartlead_pushed_at: new Date().toISOString() })
+          .eq("id", leadRow.id);
+      } catch (smartleadErr) {
+        console.error("[send-pdf] Smartlead push failed", smartleadErr);
+        await supabase
+          .schema("roi_calc")
+          .from("leads")
+          .update({
+            smartlead_error: String(
+              smartleadErr instanceof Error ? smartleadErr.message : smartleadErr
+            ).slice(0, 500),
+          })
+          .eq("id", leadRow.id);
+      }
+    } catch (uploadErr) {
+      console.error("[send-pdf] PDF storage upload failed", uploadErr);
       await supabase
         .schema("roi_calc")
         .from("leads")
         .update({
-          smartlead_error: String(
-            smartleadErr instanceof Error ? smartleadErr.message : smartleadErr
-          ).slice(0, 500),
+          smartlead_error: `storage upload failed: ${String(
+            uploadErr instanceof Error ? uploadErr.message : uploadErr
+          ).slice(0, 400)}`,
         })
         .eq("id", leadRow.id);
     }
-  } catch (uploadErr) {
-    console.error("[send-pdf] PDF storage upload failed", uploadErr);
-    // Storage failure also blocks Smartlead push (no signed URL).
-    // Record on the row, continue to return the inline PDF download.
-    await supabase
-      .schema("roi_calc")
-      .from("leads")
-      .update({
-        smartlead_error: `storage upload failed: ${String(
-          uploadErr instanceof Error ? uploadErr.message : uploadErr
-        ).slice(0, 400)}`,
-      })
-      .eq("id", leadRow.id);
   }
 
   const filename = buildFilename(validation.value);
