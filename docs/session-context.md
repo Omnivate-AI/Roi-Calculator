@@ -4,7 +4,7 @@ This file is the rehydration point. After a `/compact` or in a new
 Claude Code session, read this first to recover everything important
 about the project's state.
 
-Last updated: 2026-05-15
+Last updated: 2026-05-15 (M5 shipped, Smartlead deferred)
 
 ---
 
@@ -15,8 +15,11 @@ on the Vercel default URL pending DNS) that lets a B2B visitor enter
 some numbers about their outbound program and see projected revenue.
 Sophisticated visual design, light theme, Omnivate brand purple.
 
-Built in mini-projects M1 through M5. **M1 through M4 are shipped.
-M5 is the only outstanding work** before the project is done.
+Built in mini-projects M1 through M5. **M1 through M5 are shipped.**
+The PDF flow uses inline browser download. Email delivery via Smartlead
+was deferred because Smartlead's Basic plan does not include API access
+— see `docs/launch-runbook.md` for the wiring instructions when the
+Pro upgrade happens.
 
 ---
 
@@ -91,6 +94,7 @@ Same as `.env.local`. Set via `vercel env add NAME production`.
 | `roi_calc.config` | 1 | Single editable row, JSONB `payload` column holding the entire calculator config. Calculator page reads this. Admin page writes to it. |
 | `roi_calc.config_changes` | grows on every save | Audit log. Columns: `id`, `changed_at`, `changed_by`, `previous_payload`, `new_payload`. |
 | `roi_calc.admins` | 1 | Originally seeded with `amzat@omnivate.ai` when we planned magic-link auth. **Unused** now since we switched to shared-password auth. Safe to drop. |
+| `roi_calc.leads` | grows on every PDF download | M5 lead capture. Columns: `id`, `email`, `name`, `company_name`, `inputs` JSONB, `outputs` JSONB, `ip_hash`, `user_agent`, `created_at`. `service_role` only; no public RLS policy. |
 
 ### RLS
 

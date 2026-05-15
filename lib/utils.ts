@@ -60,3 +60,36 @@ export function formatMultiple(value: number): string {
   if (value >= 10) return `${Math.round(value)}×`;
   return `${value.toFixed(1)}×`;
 }
+
+/**
+ * Format a deal count with precision that scales with size. Big deal
+ * values mean low deal counts are still meaningful (a $200k deal once
+ * every four months is a real number, not a rounding error), so we keep
+ * two decimals under one deal, one decimal up to ten, and integers above.
+ *   value < 1   → "0.25", "0.50", "0.08"
+ *   1 ≤ value < 10 → "1.5", "6.0"
+ *   value ≥ 10  → "14", "145"
+ */
+export function formatDeals(value: number): string {
+  if (!Number.isFinite(value) || value <= 0) return "0";
+  if (value >= 10) {
+    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(
+      Math.round(value)
+    );
+  }
+  if (value >= 1) return value.toFixed(1);
+  return value.toFixed(2);
+}
+
+/**
+ * For sub-one deal counts, return a human-readable frequency caption
+ * ("≈ 1 deal every 4 months"). Returns null when the primary value is
+ * one or more, so callers can render the caption conditionally.
+ */
+export function dealFrequencyLabel(value: number): string | null {
+  if (!Number.isFinite(value) || value <= 0) return null;
+  if (value >= 1) return null;
+  const months = Math.round(1 / value);
+  if (months <= 1) return null;
+  return `≈ 1 deal every ${months} months`;
+}

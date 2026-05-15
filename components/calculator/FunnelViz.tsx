@@ -1,7 +1,7 @@
 "use client";
 
 import { Activity } from "lucide-react";
-import { formatInteger, formatPercent } from "@/lib/utils";
+import { formatDeals, formatInteger, formatPercent } from "@/lib/utils";
 import { TweenedNumber } from "./TweenedNumber";
 
 interface FunnelVizProps {
@@ -26,6 +26,7 @@ interface Stage {
   label: string;
   value: number;
   conversion?: { rate?: number; customLabel?: string };
+  format?: (n: number) => string;
 }
 
 /**
@@ -62,7 +63,12 @@ export function FunnelViz({
       conversion: { rate: rates.positive },
     },
     { label: "Meetings", value: meetings, conversion: { rate: rates.meeting } },
-    { label: "Deals closed", value: deals, conversion: { rate: rates.close } },
+    {
+      label: "Deals closed",
+      value: deals,
+      conversion: { rate: rates.close },
+      format: formatDeals,
+    },
   ];
 
   const maxValue = stages[0].value || 1;
@@ -115,7 +121,10 @@ export function FunnelViz({
                 </div>
                 <div className="w-28 text-right">
                   <div className="font-mono text-sm font-bold tabular-nums text-foreground">
-                    <TweenedNumber value={stage.value} format={formatInteger} />
+                    <TweenedNumber
+                      value={stage.value}
+                      format={stage.format ?? formatInteger}
+                    />
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
                     {stage.label}

@@ -63,7 +63,7 @@ export function Calculator({ config }: CalculatorProps) {
   return (
     <CalculatorConfigProvider value={config}>
       <section className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        {/* Left column: scrollable inputs with metrics pinned at the bottom */}
+        {/* Left column: scrollable inputs */}
         <div className="flex flex-col lg:h-[calc(100vh-220px)] lg:min-h-[600px]">
           <div className="space-y-2.5 lg:flex-1 lg:overflow-y-auto lg:pr-2 lg:[scrollbar-width:thin]">
             <ControlsPanel
@@ -72,39 +72,40 @@ export function Calculator({ config }: CalculatorProps) {
               onStrategyChange={setStrategy}
             />
           </div>
-          {/* Sticky metrics at the bottom of the left column */}
-          <div className="mt-2.5 shrink-0 lg:border-t lg:border-border lg:pt-2.5">
+        </div>
+
+        {/* Right column: funnel viz with metrics pinned beneath it */}
+        <div className="flex flex-col gap-2.5 lg:h-[calc(100vh-220px)] lg:min-h-[600px] lg:sticky lg:top-4 lg:self-start">
+          <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:pr-1 lg:[scrollbar-width:thin]">
+            <FunnelViz
+              emailsSent={outputs.emailsSentPerMonth}
+              sequenceSteps={inputs.sequenceSteps}
+              contactsReached={outputs.contactsReached}
+              opens={outputs.opens}
+              replies={outputs.replies}
+              positiveReplies={outputs.positiveReplies}
+              meetings={outputs.meetings}
+              deals={outputs.deals}
+              rates={{
+                open: inputs.openRate,
+                reply: inputs.replyRate,
+                positive: inputs.positiveReplyRate,
+                meeting: inputs.meetingBookedRate,
+                close: inputs.closeRate,
+              }}
+            />
+          </div>
+          <div className="shrink-0 lg:border-t lg:border-border lg:pt-2.5">
             <MetricsPanel
               revenuePerMonth={outputs.revenuePerMonth}
               dealsPerMonth={outputs.deals}
             />
           </div>
         </div>
-
-        {/* Right column: funnel viz, fixed (no scroll) */}
-        <div className="lg:h-[calc(100vh-220px)] lg:min-h-[600px] lg:sticky lg:top-4 lg:self-start">
-          <FunnelViz
-            emailsSent={outputs.emailsSentPerMonth}
-            sequenceSteps={inputs.sequenceSteps}
-            contactsReached={outputs.contactsReached}
-            opens={outputs.opens}
-            replies={outputs.replies}
-            positiveReplies={outputs.positiveReplies}
-            meetings={outputs.meetings}
-            deals={outputs.deals}
-            rates={{
-              open: inputs.openRate,
-              reply: inputs.replyRate,
-              positive: inputs.positiveReplyRate,
-              meeting: inputs.meetingBookedRate,
-              close: inputs.closeRate,
-            }}
-          />
-        </div>
       </section>
 
       <section className="mt-6">
-        <PdfCaptureForm />
+        <PdfCaptureForm inputs={inputs} />
       </section>
     </CalculatorConfigProvider>
   );

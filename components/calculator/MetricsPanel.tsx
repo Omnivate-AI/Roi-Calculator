@@ -1,7 +1,7 @@
 "use client";
 
 import { Handshake, Coins } from "lucide-react";
-import { formatCurrency, formatInteger } from "@/lib/utils";
+import { dealFrequencyLabel, formatCurrency, formatDeals } from "@/lib/utils";
 import { TweenedNumber } from "./TweenedNumber";
 
 interface MetricsPanelProps {
@@ -10,18 +10,21 @@ interface MetricsPanelProps {
 }
 
 /**
- * Compact two-metric strip designed to live near the top of the page so
- * visitors see the projected outcomes immediately. Deals per month and
- * revenue per month only; annual revenue removed.
+ * Compact two-metric strip showing projected outcomes per month. Deals
+ * scale precision with size and pick up a frequency caption when below
+ * one (so a $200k deal value with 0.25 deals reads as "≈ 1 deal every
+ * 4 months", not a rounded zero).
  */
 export function MetricsPanel({ revenuePerMonth, dealsPerMonth }: MetricsPanelProps) {
+  const frequency = dealFrequencyLabel(dealsPerMonth);
   return (
     <div className="grid grid-cols-2 gap-2.5">
       <MetricCard
         icon={<Handshake className="h-3.5 w-3.5" strokeWidth={2.5} />}
         label="Deals / month"
         value={dealsPerMonth}
-        format={formatInteger}
+        format={formatDeals}
+        caption={frequency}
       />
       <MetricCard
         icon={<Coins className="h-3.5 w-3.5" strokeWidth={2.5} />}
@@ -40,9 +43,10 @@ interface MetricCardProps {
   value: number;
   format: (n: number) => string;
   accent?: boolean;
+  caption?: string | null;
 }
 
-function MetricCard({ icon, label, value, format, accent }: MetricCardProps) {
+function MetricCard({ icon, label, value, format, accent, caption }: MetricCardProps) {
   return (
     <div
       className="relative overflow-hidden rounded-xl border border-border bg-card p-3"
@@ -90,6 +94,11 @@ function MetricCard({ icon, label, value, format, accent }: MetricCardProps) {
       >
         <TweenedNumber value={value} format={format} />
       </p>
+      {caption ? (
+        <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+          {caption}
+        </p>
+      ) : null}
     </div>
   );
 }
