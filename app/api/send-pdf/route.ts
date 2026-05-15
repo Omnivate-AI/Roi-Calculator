@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { calculateRoi } from "@/lib/calculations";
 import { buildRoiPdf } from "@/lib/pdf";
+import { uploadPdfAndSign } from "@/lib/pdf-storage";
 import {
   checkRateLimit,
   extractIp,
   hashIp,
 } from "@/lib/rate-limit";
+import { pushLeadToCampaign, splitName } from "@/lib/smartlead";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CalculatorInputs, SequenceSteps } from "@/lib/types";
 
@@ -56,7 +58,7 @@ export async function POST(req: Request) {
   const outputs = calculateRoi(validation.value.inputs);
 
   const supabase = createAdminClient();
-  const { error: insertError } = await supabase
+  const { data: leadRow, error: insertError } = await supabase
     .schema("roi_calc")
     .from("leads")
     .insert({
@@ -67,9 +69,11 @@ export async function POST(req: Request) {
       outputs,
       ip_hash: ipHash,
       user_agent: req.headers.get("user-agent")?.slice(0, 500) ?? null,
-    });
+    })
+    .select("id")
+    .single();
 
-  if (insertError) {
+  if (insertError || !leadRow) {
     console.error("[send-pdf] Failed to persist lead", insertError);
     return jsonError(500, "Could not save your submission. Please try again.");
   }
@@ -87,6 +91,61 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("[send-pdf] Failed to render PDF", err);
     return jsonError(500, "Could not generate the PDF. Please try again.");
+  }
+
+  // Upload PDF to Storage + push to Smartlead. Both are best-effort:
+  // the visitor still gets the inline download even if either fails.
+  // Failures are recorded on the lead row for later retry.
+  try {
+    const { storagePath, signedUrl } = await uploadPdfAndSign(
+      leadRow.id,
+      pdfBuffer
+    );
+    await supabase
+      .schema("roi_calc")
+      .from("leads")
+      .update({ pdf_storage_path: storagePath })
+      .eq("id", leadRow.id);
+
+    const { first, last } = splitName(validation.value.name);
+    try {
+      await pushLeadToCampaign({
+        email: validation.value.email.toLowerCase().trim(),
+        firstName: first,
+        lastName: last,
+        companyName: validation.value.companyName,
+        customFields: { pdf_link: signedUrl },
+      });
+      await supabase
+        .schema("roi_calc")
+        .from("leads")
+        .update({ smartlead_pushed_at: new Date().toISOString() })
+        .eq("id", leadRow.id);
+    } catch (smartleadErr) {
+      console.error("[send-pdf] Smartlead push failed", smartleadErr);
+      await supabase
+        .schema("roi_calc")
+        .from("leads")
+        .update({
+          smartlead_error: String(
+            smartleadErr instanceof Error ? smartleadErr.message : smartleadErr
+          ).slice(0, 500),
+        })
+        .eq("id", leadRow.id);
+    }
+  } catch (uploadErr) {
+    console.error("[send-pdf] PDF storage upload failed", uploadErr);
+    // Storage failure also blocks Smartlead push (no signed URL).
+    // Record on the row, continue to return the inline PDF download.
+    await supabase
+      .schema("roi_calc")
+      .from("leads")
+      .update({
+        smartlead_error: `storage upload failed: ${String(
+          uploadErr instanceof Error ? uploadErr.message : uploadErr
+        ).slice(0, 400)}`,
+      })
+      .eq("id", leadRow.id);
   }
 
   const filename = buildFilename(validation.value);

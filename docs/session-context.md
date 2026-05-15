@@ -43,6 +43,7 @@ Pro upgrade happens.
 | `C:\Users\HP\.supabase-service-key` | Supabase service role key |
 | `C:\Users\HP\.admin-password` | Admin login password (20 chars) |
 | `C:\Users\HP\.admin-session-secret` | HMAC signing key for admin session cookies |
+| `C:\Users\HP\.smartlead-api-key-clean` | Smartlead API key, UTF-8 (original `.smartlead-api-key` was UTF-16 from PowerShell; clean copy is what scripts read) |
 
 ### `.env.local` (gitignored)
 
@@ -367,9 +368,18 @@ M5 went live 2026-05-15. Inline browser download is the active delivery path; th
 5. `components/calculator/PdfCaptureForm.tsx` — POSTs current inputs, triggers download via blob URL
 6. `docs/launch-runbook.md` — daily ops, common failures, secret rotation, future Smartlead wiring
 
+### Smartlead email delivery (shipped 2026-05-15 post-M5)
+
+After Omar confirmed API access, the Smartlead integration was wired:
+- Dedicated campaign **`ROI Calculator PDF Delivery`** (id `3343315`), single-email sequence with `{{pdf_link}}` merge tag
+- `roi_calc_pdfs` Supabase Storage bucket (private), 30-day signed URLs
+- New columns on `roi_calc.leads`: `pdf_storage_path`, `smartlead_pushed_at`, `smartlead_error`
+- `lib/smartlead.ts` is scope-locked: campaign id is read from `SMARTLEAD_CAMPAIGN_ID` env var, no caller can override it; only the lead-add endpoint is exposed
+- `lib/pdf-storage.ts` uploads to the private bucket and signs URLs via the service-role client
+- Smartlead push is best-effort: if it fails, the visitor still gets the inline PDF and the failure is logged to the lead row for later retry
+
 ### Deferred to a follow-up
 
-- **Smartlead email delivery** — gated on Smartlead plan upgrade. Their Basic plan ($39/mo) does not include API access; Pro ($94/mo) is required. Full wiring instructions live in `docs/launch-runbook.md` under "Future work: hooking up Smartlead"
 - **DNS for `roi.omnivate.ai`** — still pending Omar
 
 ---
